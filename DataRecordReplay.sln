@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29905.134
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EDCoder", "EDCoder\EDCoder.csproj", "{33E375D4-B29E-433C-A79A-25B655D21B26}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RecordCore", "RecordCore\RecordCore.csproj", "{C659479B-069C-46C4-94F0-A52CC96579FE}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{33E375D4-B29E-433C-A79A-25B655D21B26}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{33E375D4-B29E-433C-A79A-25B655D21B26}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{33E375D4-B29E-433C-A79A-25B655D21B26}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{33E375D4-B29E-433C-A79A-25B655D21B26}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C659479B-069C-46C4-94F0-A52CC96579FE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C659479B-069C-46C4-94F0-A52CC96579FE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C659479B-069C-46C4-94F0-A52CC96579FE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C659479B-069C-46C4-94F0-A52CC96579FE}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {B15F6DDD-E0C3-4C3B-9428-BEEAB1E231D0}
+	EndGlobalSection
+EndGlobal
