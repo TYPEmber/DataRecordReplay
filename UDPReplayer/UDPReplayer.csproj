@@ -1,12 +1,12 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
+    <OutputType>Exe</OutputType>
     <TargetFramework>netcoreapp3.1</TargetFramework>
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\EDCoder\EDCoder.csproj" />
-    <ProjectReference Include="..\FileManager\FileManager.csproj" />
+    <ProjectReference Include="..\ReplayCore\ReplayCore.csproj" />
   </ItemGroup>
 
 </Project>
