@@ -16,6 +16,7 @@ namespace FileManager
         long _currentIndex;
 
         public long Count { get { return _index.Total; } }
+        public double Interval { get { return _current.header.timeInterval; } }
 
         public Reader(List<string> paths)
         {
@@ -63,11 +64,23 @@ namespace FileManager
             pkg.time = pkg.index * _current.header.timeInterval + _current.header.time;
         }
 
-        public Package Read()
+        public Package Get()
         {
             _buffer.TryDequeue(out Package pkg);
 
             return pkg;
+        }
+
+        public Package Peek()
+        {
+            _buffer.TryPeek(out Package pkg);
+
+            return pkg;
+        }
+
+        public void Return(ref Package pkg)
+        {
+            PackagePool.Return(ref pkg);
         }
 
         public bool Set(long index)
@@ -106,6 +119,7 @@ namespace FileManager
                     if (_buffer.Count <= 10)
                     {
                         Package pkg = PackagePool.Rent();
+                        //Package pkg = new Package();
 
                         Get(ref pkg);
 
@@ -113,8 +127,8 @@ namespace FileManager
 
                         _buffer.Enqueue(pkg);
 
-                        // 减少内存占用
-                        //Console.WriteLine(GC.GetTotalMemory(false) - 10 * (pkg.codedBytes.Length + pkg.originBytes.Length + pkg.msgsAsBytesLength)); 
+                        //减少内存占用
+                        //Console.WriteLine(GC.GetTotalMemory(false) - 10 * (pkg.codedBytes.Length + pkg.originBytes.Length + pkg.msgsAsBytesLength));
                         if (GC.GetTotalMemory(false) > 10 * (pkg.codedBytes.Length + pkg.originBytes.Length + pkg.msgsAsBytesLength))
                         {
                             GC.Collect();

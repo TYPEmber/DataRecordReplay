@@ -8,6 +8,7 @@ using FileManager;
 using EDCoder;
 using System.Net;
 using System.Diagnostics;
+using DRRCommon.Logger;
 
 namespace ReplayCore
 {
@@ -53,61 +54,62 @@ namespace ReplayCore
         public delegate void DeleSendHandler(ReadOnlySpan<byte> bytes, IPEndPoint point);
         public DeleSendHandler SendHandler;
 
-        public double SpeedRate { set; get; } = 1.0;
+        public double SpeedRate { set; get; } = 1;
 
         private void RePlayThread()
         {
             Task.Run(() =>
             {
                 Stopwatch watch = new Stopwatch();
-                double sleepDelay = 0;
-                double sendDelay = 0;
+                double sleepDelay = 0.0005;
+                double sendDelay = 0.000005;
 
                 while (true)
                 {
-                    if (DateTime.UtcNow.TotalSeconds() > 1 / SpeedRate)
-                    {
-                        watch.Restart();
-                        var pkg = _reader.Read();
-                         
-                        if (pkg == null)
-                        {
-                            SleepHelper.Delay(1);
-                            continue;
-                        }
+                    watch.Restart();
 
-                        // 播放完毕
-                        if (pkg.index >= _reader.Count)
-                        {
-                            SleepHelper.Delay(1);
-                            continue;
-                        }
+                    var pkg = _reader.Get();
 
-                        foreach (var msg in pkg.GetMessages())
-                        {
-                            var sendTiming = (msg.header.time - pkg.time) / SpeedRate;
-                            while (watch.ElapsedMilliseconds / 1000.0 + sleepDelay + sendDelay < sendTiming)
-                            {
-                                SleepHelper.Delay(1);
-                            }
-
-                            _map.TryGetValue(ConverToIP64(msg.header.ip, msg.header.port), out var point);
-                            if (point == null)
-                            {
-                                continue;
-                            }
-
-                            SendHandler?.Invoke(msg.bytes.Span, point);
-                        }
-
-                        PackagePool.Return(ref pkg);
-
-                        watch.Stop();
-                    }
-                    else
+                    if (pkg == null)
                     {
                         SleepHelper.Delay(1);
+                        continue;
                     }
+
+                    // 播放完毕
+                    if (pkg.index >= _reader.Count)
+                    {
+                        SleepHelper.Delay(1);
+                        continue;
+                    }
+
+                    foreach (var msg in pkg.GetMessages())
+                    {
+                        var sendTiming = (msg.header.time - pkg.time) / SpeedRate;
+                        while (watch.ElapsedMilliseconds / 1000.0 + sleepDelay + sendDelay < sendTiming)
+                        {
+                            SleepHelper.Delay(sleepDelay);
+                        }
+
+                        _map.TryGetValue(ConverToIP64(msg.header.ip, msg.header.port), out var point);
+                        if (point == null)
+                        {
+                            continue;
+                        }
+
+                        SendHandler?.Invoke(msg.bytes.Span, point);
+                    }
+
+                    // 缓解内存压力
+                    _reader.Return(ref pkg);
+
+                    while (watch.ElapsedMilliseconds / 1000.0 + sleepDelay < _reader.Interval / SpeedRate)
+                    {
+                        //Logger.Debug.WriteLine(watch.ElapsedMilliseconds);
+                        SleepHelper.Delay(sleepDelay);
+                    }
+
+                    Logger.Debug.WriteLine(watch.ElapsedMilliseconds);
                 }
 
             });

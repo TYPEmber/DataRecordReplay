@@ -7,9 +7,14 @@ namespace DRRCommon
     {
         static Socket _socket = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
 
-        public static void Delay(int millSenconds)
+        public static void Delay(int millSeconds)
         {
-            _socket.Poll(millSenconds * 1000, SelectMode.SelectRead);
+            _socket.Poll(millSeconds * 1000, SelectMode.SelectRead);
+        }
+
+        public static void Delay(double seconds)
+        {
+            _socket.Poll((int)(seconds * 1000 * 1000), SelectMode.SelectRead);
         }
     }
 }
