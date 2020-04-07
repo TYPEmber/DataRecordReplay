@@ -98,6 +98,8 @@ namespace DRRCommon
         public int originLength;
         public byte[] originBytes;
 
+        public int MsgCount { get { return msgs.Count; } }
+
         public Package()
         {
             msgs = new LinkedList<Message>();

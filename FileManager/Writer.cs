@@ -26,16 +26,23 @@ namespace FileManager
 
         private File _current;
 
-        public Writer(List<double> segmentPara, string path, string notes, List<IPEndPoint> listenPoints, double timeInterval, double startTime)
+        public Writer(List<double> segmentPara, string path, string name, string notes, List<IPEndPoint> listenPoints, double timeInterval, double startTime)
         {
             //TODO: para check
             _segmentPara = segmentPara;
+
+            if (!path.EndsWith("/"))
+            {
+                path += "/";
+            }
+            // 确保文件夹存在
+            Directory.CreateDirectory(path);
 
             _current = new File()
             {
                 notes = notes,
                 listenPoints = listenPoints,
-                pathHeader = path,
+                pathWithName = path + name,
                 partNum = 0,
                 header = new File.Header()
                 {
@@ -73,7 +80,7 @@ namespace FileManager
             {
                 var next = _current.CreateNext(pkg.time);
 
-                _current.Close();
+                this.FlushAndClose();
                 _current = next;
             }
 
@@ -82,5 +89,10 @@ namespace FileManager
             _current.Write(pkg);
         }
 
+        public void FlushAndClose()
+        {
+            _current.Flush();
+            _current.Close();
+        }
     }
 }

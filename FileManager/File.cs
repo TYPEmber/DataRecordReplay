@@ -34,7 +34,7 @@ namespace FileManager
         public string notes;
 
         public int partNum;
-        public string pathHeader;
+        public string pathWithName;
 
         public int p;
         public List<long> index;
@@ -72,9 +72,8 @@ namespace FileManager
             p = 0;
             index = new List<long>();
 
-
             // FileMode.Create : 如果存在同名文件则覆盖
-            fs = new FileStream(pathHeader + "_" + partNum + ".lcl", FileMode.Create, FileAccess.Write);
+            fs = new FileStream(pathWithName + "_" + partNum + ".lcl", FileMode.Create, FileAccess.Write);
 
             // 跳过 header 部分
             // 因为部分数据需要之后才能确定
@@ -200,9 +199,12 @@ namespace FileManager
             }
         }
 
-        public void Close()
+        public void Flush()
         {
             fs.Flush();
+        }
+        public void Close()
+        {
             fs.Close();
         }
     }

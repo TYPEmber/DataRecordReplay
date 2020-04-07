@@ -6,6 +6,7 @@ using FileManager;
 using DRRCommon;
 using System.Collections.Generic;
 using System.Net;
+using DRRCommon.Logger;
 
 namespace RecordCore
 {
@@ -15,17 +16,22 @@ namespace RecordCore
         private double _intervalTime;
 
         private Writer _writer;
-        public Core(List<double> segmentPara, string path, string notes, List<IPEndPoint> points, double intervalTime = 1.0)
+        public Core(List<double> segmentPara, string path, string name, string notes, List<IPEndPoint> points, double intervalTime = 1.0)
         {
             _intervalTime = intervalTime;
             _startTimeStamp = DateTime.UtcNow.TotalSeconds();
 
             _writer = new Writer(segmentPara,
-                path, notes,
+                path, name, notes,
                 points,
                 intervalTime, _startTimeStamp);
 
             ProcessStart();
+        }
+
+        public void WriteComplete()
+        {
+            _writer.FlushAndClose();
         }
 
         private ConcurrentQueue<Message> _queue = new ConcurrentQueue<Message>();
@@ -53,6 +59,10 @@ namespace RecordCore
                             {
                                 _writer.Append(pkg);
 
+                                Logger.Info.WriteLine("Pkg_Count: " + pkg.MsgCount
+                                                    + " Compress_Rate: " + (pkg.codedLength * 100.0 / (pkg.originLength == 0 ? -pkg.codedLength : pkg.originLength)).ToString("f2") + "%"
+                                                    + " Pkg_Time: " + pkg.time);
+
                                 indexTime += _intervalTime;
 
                                 //pkg = new Package()
@@ -78,6 +88,10 @@ namespace RecordCore
                         do
                         {
                             _writer.Append(pkg);
+
+                            Logger.Info.WriteLine("Pkg_Count: " + pkg.MsgCount
+                                                + " Compress_Rate: " + (pkg.codedLength * 100.0 / (pkg.originLength == 0 ? -pkg.codedLength : pkg.originLength)).ToString("f2") + "%"
+                                                + " Pkg_Time: " + pkg.time);
 
                             indexTime += _intervalTime;
 
