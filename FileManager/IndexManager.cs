@@ -29,6 +29,8 @@ namespace FileManager
             {
                 _indexsCount[i] += _indexsCount[i - 1];
             }
+
+            _files = files;
         }
 
         public bool Convert(long index, out File current, out int innerIndex)

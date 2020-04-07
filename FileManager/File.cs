@@ -110,9 +110,12 @@ namespace FileManager
         {
             File next = this.MemberwiseClone() as File;
 
-            next.partNum++;
 
-            next.Create().header.time = time;
+            next.partNum++;
+            next.header.time = time;
+            // Create 中会写入文件
+            // 因此需要修改的量需要先修改
+            next.Create();
 
             return next;
         }
