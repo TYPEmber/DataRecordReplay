@@ -92,7 +92,7 @@ namespace UDPRecorder
             List<double> segPara = new List<double>() { 2048, 3600 };
             if (para.ContainsKey("-s"))
             {
-                var ss = para["-i"].Split(" ");
+                var ss = para["-s"].Split(" ");
                 try
                 {
                     segPara[0] = double.Parse(ss[0]);

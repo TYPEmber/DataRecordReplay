@@ -2,7 +2,7 @@
   "profiles": {
     "UDPRecorder": {
       "commandName": "Project",
-      "commandLineArgs": "-l \"5603 8912\" -i 1.0 -p test -f tt -n \"El Psy Congroo!\""
+      "commandLineArgs": "-l \"5603 8912\" -i 1.0 -p test -f tt -n \"El Psy Congroo!\" -s \"100 3600\""
     }
   }
 }
