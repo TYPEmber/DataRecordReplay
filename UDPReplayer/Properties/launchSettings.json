@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "UDPReplayer": {
+      "commandName": "Project",
+      "commandLineArgs": "-m \"5603=>127.0.0.1:5603 8912=>127.0.0.1:8912\" -p test/"
+    }
+  }
+}

@@ -18,7 +18,7 @@ namespace FileManager
         public long Count { get { return _index.Total; } }
         public double Interval { get { return _current.header.timeInterval; } }
 
-        public Reader(List<string> paths)
+        public Reader(IEnumerable<string> paths)
         {
             _files = new List<File>();
 
@@ -35,7 +35,7 @@ namespace FileManager
             BufferThread();
         }
 
-        private void Get(ref Package pkg)
+        private void ReadFile(ref Package pkg)
         {
             // 当前 file 读取到末尾
             if (_current.Position >= _current.Length)
@@ -64,6 +64,13 @@ namespace FileManager
             pkg.time = pkg.index * _current.header.timeInterval + _current.header.time;
         }
 
+        public File.Info GetFileInfo()
+        {
+            var info = _current.GetInfo();
+            info.totalIndex = this.Count; 
+            return info;
+        }
+
         public Package Get()
         {
             _buffer.TryDequeue(out Package pkg);
@@ -86,11 +93,16 @@ namespace FileManager
         public bool Set(long index)
         {
             _buffer.TryPeek(out Package pkg);
-            // 避免未变化指针但却重置缓冲队列
-            if (index == pkg.index)
+
+            if (pkg != null)
             {
-                return true;
+                // 避免未变化指针但却重置缓冲队列
+                if (index == pkg.index)
+                {
+                    return true;
+                }
             }
+
 
             // 缓冲队列清空
             _buffer.Clear();
@@ -121,7 +133,7 @@ namespace FileManager
                         Package pkg = PackagePool.Rent();
                         //Package pkg = new Package();
 
-                        Get(ref pkg);
+                        this.ReadFile(ref pkg);
 
                         EDCoder.Decoder.GetMessages(ref pkg);
 

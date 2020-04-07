@@ -32,7 +32,7 @@ namespace ReplayCore
             return result;
         }
 
-        public Core(List<string> paths, Dictionary<IPEndPoint, IPEndPoint> map)
+        public Core(IEnumerable<string> paths, Dictionary<IPEndPoint, IPEndPoint> map)
         {
             _reader = new Reader(paths);
 
@@ -44,6 +44,32 @@ namespace ReplayCore
             }
 
             RePlayThread();
+        }
+
+        public File.Info GetFileInfo()
+        {
+            return _reader.GetFileInfo();
+        }
+
+        Stopwatch _watch = new Stopwatch();
+
+        public bool IsPlaying { get { return _watch.IsRunning; } }
+        // 播放/暂停
+        public void P()
+        {
+            if (_watch.IsRunning)
+            {
+                _watch.Stop();
+            }
+            else
+            {
+                // 保证缓冲队列有数据
+                while (_reader.Peek() == null)
+                {
+                    SleepHelper.Delay(1);
+                }
+                _watch.Start();
+            }
         }
 
         public bool JumpTo(long index)
@@ -60,14 +86,11 @@ namespace ReplayCore
         {
             Task.Run(() =>
             {
-                Stopwatch watch = new Stopwatch();
                 double sleepDelay = 0.0005;
                 double sendDelay = 0.000005;
 
                 while (true)
                 {
-                    watch.Restart();
-
                     var pkg = _reader.Get();
 
                     if (pkg == null)
@@ -86,7 +109,7 @@ namespace ReplayCore
                     foreach (var msg in pkg.GetMessages())
                     {
                         var sendTiming = (msg.header.time - pkg.time) / SpeedRate;
-                        while (watch.ElapsedMilliseconds / 1000.0 + sleepDelay + sendDelay < sendTiming)
+                        while (_watch.ElapsedMilliseconds / 1000.0 + sleepDelay + sendDelay < sendTiming)
                         {
                             SleepHelper.Delay(sleepDelay);
                         }
@@ -103,13 +126,15 @@ namespace ReplayCore
                     // 缓解内存压力
                     _reader.Return(ref pkg);
 
-                    while (watch.ElapsedMilliseconds / 1000.0 + sleepDelay < _reader.Interval / SpeedRate)
+                    while (_watch.ElapsedMilliseconds / 1000.0 + sleepDelay < _reader.Interval / SpeedRate)
                     {
                         //Logger.Debug.WriteLine(watch.ElapsedMilliseconds);
                         SleepHelper.Delay(sleepDelay);
                     }
 
-                    Logger.Debug.WriteLine(watch.ElapsedMilliseconds);
+                    Logger.Debug.WriteLine(_watch.ElapsedMilliseconds);
+
+                    _watch.Restart();
                 }
 
             });

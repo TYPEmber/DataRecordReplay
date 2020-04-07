@@ -12,6 +12,24 @@ namespace FileManager
 {
     public class File
     {
+        public class Info
+        {
+            public Header header { set; get; }
+            public IPEndPoint[] points { set; get; }
+            public string notes { set; get; }
+            public long totalIndex { set; get; }
+        }
+        public Info GetInfo()
+        {
+            return new Info()
+            {
+                header = this.header,
+                points = this.listenPoints.ToArray(),
+                notes = this.notes,
+                totalIndex = this.index.Count
+            };
+        }
+
         [StructLayoutAttribute(LayoutKind.Sequential, Pack = 1)]
         public struct Header
         {
