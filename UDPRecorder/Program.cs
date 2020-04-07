@@ -157,8 +157,9 @@ namespace UDPRecorder
 
             while (true)
             {
-                var key = Console.Read();
-                if (key == 'c')
+                var key = Console.ReadKey();
+
+                if (key.Key == ConsoleKey.C)
                 {
                     foreach (var rec in _recivers)
                     {
@@ -166,7 +167,8 @@ namespace UDPRecorder
                     }
 
                     _core.WriteComplete();
-                    break;
+
+                    return;
                 }
             }
         }

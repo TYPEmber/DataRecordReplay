@@ -61,6 +61,55 @@ namespace UDPReplayer
                 para.Add(args[i], args[i + 1]);
             }
 
+            if (para.Count == 0)
+            {
+                para.Add("-t", "para.txt");
+            }
+
+            if (para.ContainsKey("-t"))
+            {
+                if (File.Exists(para["-t"]))
+                {
+                    var str = File.ReadAllText(para["-t"]);
+
+                    List<string> buff = new List<string>();
+                    args = File.ReadAllText(para["-t"]).Split(" ");
+                    for (int i = 0; i < args.Length; i++)
+                    {
+                        if (args[i].Contains("\""))
+                        {
+                            for (int j = i + 1; j < args.Length; j++)
+                            {
+                                args[i] += " " + args[j];
+
+                                if (args[j].Contains("\""))
+                                {
+                                    buff.Add(args[i].Trim('\"'));
+                                    i = j;
+                                    break;
+                                }
+                            }
+                        }
+                        else
+                        {
+                            buff.Add(args[i]);
+                        }
+                    }
+
+                    args = buff.ToArray();
+
+                    for (int i = 0; i < args.Length; i += 2)
+                    {
+                        para.Add(args[i], args[i + 1]);
+                    }
+                }
+                else
+                {
+                    Logger.Error.WriteLine("No Such ParaFile!");
+                    return;
+                }
+            }
+
             string[] paths = null;
             // 加载单一文件
             if (para.ContainsKey("-f"))
