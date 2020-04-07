@@ -11,7 +11,7 @@ namespace UDPReplayer
 {
     class Program
     {
-        static ReplayCore.Core core;
+        static Core.ReplayCore core;
 
         static void ParseInputIpPort(string s, out string ip, out ushort port)
         {
@@ -61,11 +61,12 @@ namespace UDPReplayer
                 para.Add(args[i], args[i + 1]);
             }
 
+            // 不指定参数则尝试加载默认配置
             if (para.Count == 0)
             {
                 para.Add("-t", "para.txt");
             }
-
+            // 从配置文件中加载参数
             if (para.ContainsKey("-t"))
             {
                 if (File.Exists(para["-t"]))
@@ -76,6 +77,8 @@ namespace UDPReplayer
                     args = File.ReadAllText(para["-t"]).Split(" ");
                     for (int i = 0; i < args.Length; i++)
                     {
+                        // "\"" 内可能有" "
+                        // 需要将其合并
                         if (args[i].Contains("\""))
                         {
                             for (int j = i + 1; j < args.Length; j++)
@@ -165,10 +168,14 @@ namespace UDPReplayer
                 Logger.Error.WriteLine("No Map Para!");
             }
 
-            core = new ReplayCore.Core(paths, map);
+            core = new Core.ReplayCore(paths, map);
 
             // 显示 info
-            var info = core.GetFileInfo();
+            var info = core.FileInfo;
+
+            Logger.Info.WriteLine("TotalIndex: " + info.totalIndex 
+                + " StartTime: " + info.time
+                + " TotalTime: " + info.totalIndex * info.timeInterval + "s");
 
             Logger.Info.WriteLine("Notes: " + info.notes);
 

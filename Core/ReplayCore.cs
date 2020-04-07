@@ -10,9 +10,9 @@ using System.Net;
 using System.Diagnostics;
 using DRRCommon.Logger;
 
-namespace ReplayCore
+namespace Core
 {
-    public class Core
+    public class ReplayCore
     {
         Reader _reader;
 
@@ -32,7 +32,7 @@ namespace ReplayCore
             return result;
         }
 
-        public Core(IEnumerable<string> paths, Dictionary<IPEndPoint, IPEndPoint> map)
+        public ReplayCore(IEnumerable<string> paths, Dictionary<IPEndPoint, IPEndPoint> map)
         {
             _reader = new Reader(paths);
 
@@ -46,7 +46,7 @@ namespace ReplayCore
             RePlayThread();
         }
 
-        public File.Info FileInfo { get { return _reader.GetFileInfo(); } }
+        public File.Info FileInfo { get { return _reader.GetFilesInfo(); } }
 
         Stopwatch _watch = new Stopwatch();
 
@@ -71,6 +71,7 @@ namespace ReplayCore
 
         public bool JumpTo(long index)
         {
+            _watch.Reset();
             return _reader.Set(index);
         }
 
@@ -129,7 +130,7 @@ namespace ReplayCore
                         SleepHelper.Delay(sleepDelay);
                     }
 
-                    Logger.Debug.WriteLine(_watch.ElapsedMilliseconds);
+                    Logger.Debug.WriteLine(pkg.index + " " +_watch.ElapsedMilliseconds);
 
                     _watch.Restart();
                 }

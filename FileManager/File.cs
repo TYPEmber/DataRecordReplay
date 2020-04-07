@@ -14,7 +14,10 @@ namespace FileManager
     {
         public class Info
         {
-            public Header header { set; get; }
+            public int version_file;
+            public int version_code;
+            public double time;
+            public double timeInterval;
             public IPEndPoint[] points { set; get; }
             public string notes { set; get; }
             public long totalIndex { set; get; }
@@ -23,7 +26,10 @@ namespace FileManager
         {
             return new Info()
             {
-                header = this.header,
+                version_file = this.header.version_file,
+                version_code = this.header.version_code,
+                time = this.header.time,
+                timeInterval = this.header.timeInterval,
                 points = this.listenPoints.ToArray(),
                 notes = this.notes,
                 totalIndex = this.index.Count

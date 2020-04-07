@@ -9,7 +9,7 @@ namespace UDPRecorder
 {
     class Program
     {
-        static RecordCore.Core _core;
+        static Core.RecordCore _core;
         static List<UDPReciverWithTime> _recivers = new List<UDPReciverWithTime>();
 
         static void InitialReciver(string ip, int port, ref List<IPEndPoint> points)
@@ -89,7 +89,7 @@ namespace UDPRecorder
                 return;
             }
 
-            List<double> segPara = new List<double>() { 2048, 3600 };
+            double[] segPara = new double[] { 2048, 3600 };
             if (para.ContainsKey("-s"))
             {
                 var ss = para["-s"].Split(" ");
@@ -146,7 +146,7 @@ namespace UDPRecorder
                 }
             }
 
-            _core = new RecordCore.Core(segPara, path, name, notes, points);
+            _core = new Core.RecordCore(segPara, path, name, notes, points);
 
             // 保证在 core 实例化之后
             // 否则回调函数里的 core 会为 null

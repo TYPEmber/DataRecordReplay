@@ -15,10 +15,11 @@ namespace FileManager
         File _current;
         long _currentIndex;
 
+        public double StartTime { private set; get; }
         public long Count { get { return _index.Total; } }
         public double Interval { get { return _current.header.timeInterval; } }
 
-        public Reader(IEnumerable<string> paths)
+        public Reader(IEnumerable<string> paths, bool flagAutoDecode = true)
         {
             _files = new List<File>();
 
@@ -30,44 +31,27 @@ namespace FileManager
             _index = new IndexManager(_files);
             _current = _files[0];
 
+            StartTime = _current.header.time;
 
-            // 缓冲加载线程
-            BufferThread();
-        }
-
-        private void ReadFile(ref Package pkg)
-        {
-            // 当前 file 读取到末尾
-            if (_current.Position >= _current.Length)
+            if (flagAutoDecode)
             {
-                // 表明还有后续文件
-                if (_currentIndex < _index.Total)
-                {
-                    if (_index.Convert(_currentIndex, out File current, out int index))
-                    {
-                        _current = current;
-                        _current.Locate(index);
-                    }
-                    else
-                    {
-                        throw new Exception();
-                    }
-                }
-                else
-                {
-                    // 播放至尽头
-                }
+                // 缓冲加载线程
+                BufferThread();
+            }
+            else
+            {
+                BufferThreadWithoutDecode();
             }
 
-            _current.Read(ref pkg);
-            pkg.index = _currentIndex;
-            pkg.time = pkg.index * _current.header.timeInterval + _current.header.time;
         }
 
-        public File.Info GetFileInfo()
+        public File.Info GetFilesInfo()
         {
             var info = _current.GetInfo();
+
+            info.time = StartTime;
             info.totalIndex = this.Count; 
+
             return info;
         }
 
@@ -121,6 +105,36 @@ namespace FileManager
             }
         }
 
+
+        private void ReadFile(ref Package pkg)
+        {
+            // 当前 file 读取到末尾
+            if (_current.Position >= _current.Length)
+            {
+                // 表明还有后续文件
+                if (_currentIndex < _index.Total)
+                {
+                    if (_index.Convert(_currentIndex, out File current, out int index))
+                    {
+                        _current = current;
+                        _current.Locate(index);
+                    }
+                    else
+                    {
+                        throw new Exception();
+                    }
+                }
+                else
+                {
+                    // 播放至尽头
+                    pkg = null;
+                    return;
+                }
+            }
+
+            _current.Read(ref pkg);
+        }
+
         ConcurrentQueue<Package> _buffer = new ConcurrentQueue<Package>();
         private void BufferThread()
         {
@@ -128,12 +142,21 @@ namespace FileManager
             {
                 while (true)
                 {
-                    if (_buffer.Count <= 10)
+                    if (_buffer.Count <= 3)
                     {
                         Package pkg = PackagePool.Rent();
                         //Package pkg = new Package();
 
                         this.ReadFile(ref pkg);
+
+                        if (pkg == null)
+                        {
+                            SleepHelper.Delay(1);
+                            continue;
+                        }
+
+                        pkg.index = _currentIndex;
+                        pkg.time = pkg.index * _current.header.timeInterval + _current.header.time;
 
                         EDCoder.Decoder.GetMessages(ref pkg);
 
@@ -141,7 +164,48 @@ namespace FileManager
 
                         //减少内存占用
                         //Console.WriteLine(GC.GetTotalMemory(false) - 10 * (pkg.codedBytes.Length + pkg.originBytes.Length + pkg.msgsAsBytesLength));
-                        if (GC.GetTotalMemory(false) > 10 * (pkg.codedBytes.Length + pkg.originBytes.Length + pkg.msgsAsBytesLength))
+                        if (GC.GetTotalMemory(false) > 3 * (pkg.codedBytes.Length + pkg.originBytes.Length + pkg.msgsAsBytesLength))
+                        {
+                            GC.Collect();
+                        }
+
+                        _currentIndex++;
+                    }
+
+                    SleepHelper.Delay(10);
+                }
+            });
+        }
+
+        private void BufferThreadWithoutDecode()
+        {
+            Task.Run(() =>
+            {
+                while (true)
+                {
+                    if (_buffer.Count <= 3)
+                    {
+                        Package pkg = PackagePool.Rent();
+                        //Package pkg = new Package();
+
+                        this.ReadFile(ref pkg);
+
+                        if (pkg == null)
+                        {
+                            SleepHelper.Delay(1);
+                            continue;
+                        }
+
+                        pkg.index = _currentIndex;
+                        pkg.time = pkg.index * _current.header.timeInterval + _current.header.time;
+
+                        //EDCoder.Decoder.GetMessages(ref pkg);
+
+                        _buffer.Enqueue(pkg);
+
+                        //减少内存占用
+                        //Console.WriteLine(GC.GetTotalMemory(false) - 10 * (pkg.codedBytes.Length + pkg.originBytes.Length + pkg.msgsAsBytesLength));
+                        if (GC.GetTotalMemory(false) > 3 * (pkg.codedBytes.Length + pkg.originBytes.Length + pkg.msgsAsBytesLength))
                         {
                             GC.Collect();
                         }

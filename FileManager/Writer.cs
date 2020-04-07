@@ -22,11 +22,11 @@ namespace FileManager
         // _segmentPara[0] 为分割数据 单位为 MB
         // _segmentPara[1] 为分割时间 单位为 s
         // 数值为 0 则表明不分割该项
-        private List<double> _segmentPara;
+        private double[] _segmentPara;
 
         private File _current;
 
-        public Writer(List<double> segmentPara, string path, string name, string notes, List<IPEndPoint> listenPoints, double timeInterval, double startTime)
+        public Writer(double[] segmentPara, string path, string name, string notes, List<IPEndPoint> listenPoints, double timeInterval, double startTime)
         {
             //TODO: para check
             _segmentPara = segmentPara;
@@ -85,6 +85,39 @@ namespace FileManager
             }
 
             EDCoder.Encoder.GetBytes(ref pkg);
+
+            _current.Write(pkg);
+        }
+
+        public void AppendCoded(Package pkg)
+        {
+            bool segFlag = false;
+
+            // 表明数据上要做分割
+            if (_segmentPara[0] != 0)
+            {
+                if (_current.Position + pkg.codedLength > _segmentPara[0] * 1024 * 1024)
+                {
+                    segFlag = true;
+                }
+            }
+            // else ：如果已在数据上完成分割则本次无需判断是否在时间长度上需要被分割
+            // 表明时间长度上要做分割
+            if (_segmentPara[1] != 0 && !segFlag)
+            {
+                if (pkg.time - _current.header.time > _segmentPara[1])
+                {
+                    segFlag = true;
+                }
+            }
+
+            if (segFlag)
+            {
+                var next = _current.CreateNext(pkg.time);
+
+                this.FlushAndClose();
+                _current = next;
+            }
 
             _current.Write(pkg);
         }
