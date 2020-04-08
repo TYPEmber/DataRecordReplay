@@ -60,6 +60,8 @@ namespace Core
                             {
                                 _writer.Append(pkg);
 
+                                //TODO: 用事件来向外输出
+                                // Core 中不应该有直接输出
                                 Logger.Info.WriteLine("Pkg_Count: " + pkg.MsgCount
                                                     + " Compress_Rate: " + (pkg.codedLength * 100.0 / (pkg.originLength == 0 ? -pkg.codedLength : pkg.originLength)).ToString("f2") + "%"
                                                     + " Pkg_Time: " + pkg.time);
@@ -90,6 +92,8 @@ namespace Core
                         {
                             _writer.Append(pkg);
 
+                            //TODO: 用事件来向外输出
+                            // Core 中不应该有直接输出
                             Logger.Info.WriteLine("Pkg_Count: " + pkg.MsgCount
                                                 + " Compress_Rate: " + (pkg.codedLength * 100.0 / (pkg.originLength == 0 ? -pkg.codedLength : pkg.originLength)).ToString("f2") + "%"
                                                 + " Pkg_Time: " + pkg.time);

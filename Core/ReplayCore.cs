@@ -84,6 +84,7 @@ namespace Core
         {
             Task.Run(() =>
             {
+                //TODO: 对 delay 进行测算
                 double sleepDelay = 0.0005;
                 double sendDelay = 0.000005;
 
@@ -130,6 +131,8 @@ namespace Core
                         SleepHelper.Delay(sleepDelay);
                     }
 
+                    //TODO: 用事件来向外输出
+                    // Core 中不应该有直接输出
                     Logger.Debug.WriteLine(pkg.index + " " +_watch.ElapsedMilliseconds);
 
                     _watch.Restart();

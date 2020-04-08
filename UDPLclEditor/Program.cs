@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+
 using Core;
+using DRRCommon.Logger;
 
 namespace UDPLclEditor
 {
@@ -9,7 +11,18 @@ namespace UDPLclEditor
         static EditCore core;
         static void Main(string[] args)
         {
-            Console.WriteLine("Hello World!");
+            if (args.Length % 2 != 0)
+            {
+                Logger.Error.WriteLine("Para Input Error!");
+                return;
+            }
+
+            Dictionary<string, string> para = new Dictionary<string, string>();
+
+            for (int i = 0; i < args.Length; i += 2)
+            {
+                para.Add(args[i], args[i + 1]);
+            }
 
             core = new EditCore(new List<string>()
             {
