@@ -16,10 +16,28 @@ namespace FileManager
         {
             public int version_file;
             public int version_code;
+            /// <summary>
+            /// 起始时间
+            /// 当前 UTC 时间从 1970-01-01 的总秒数
+            /// 单位：s
+            /// </summary>
             public double time;
+            /// <summary>
+            /// 每个 pkg 时间跨度
+            /// 单位：s
+            /// </summary>
             public double timeInterval;
+            /// <summary>
+            /// 该 File 记录的是从这些 IPEndPoint 中收到到的数据
+            /// </summary>
             public IPEndPoint[] points { set; get; }
+            /// <summary>
+            /// 备注
+            /// </summary>
             public string notes { set; get; }
+            /// <summary>
+            /// 总 index 数量
+            /// </summary>
             public long totalIndex { set; get; }
         }
         public Info GetInfo()

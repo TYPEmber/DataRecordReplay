@@ -168,7 +168,14 @@ namespace UDPReplayer
                 Logger.Error.WriteLine("No Map Para!");
             }
 
-            core = new Core.ReplayCore(paths, map);
+            UDPSender sender = new UDPSender();
+
+            Core.ReplayCore.DeleSendHandler sendHandler = (ReadOnlySpan<byte> bytes, IPEndPoint point) =>
+            {
+                sender.Send(bytes.ToArray(), point);
+            };
+
+            core = new Core.ReplayCore(paths, map, sendHandler);
 
             // 显示 info
             var info = core.FileInfo;
@@ -191,13 +198,6 @@ namespace UDPReplayer
                     Logger.Info.WriteLine(point + " => ");
                 }
             }
-
-            UDPSender sender = new UDPSender();
-
-            core.SendHandler = (ReadOnlySpan<byte> bytes, IPEndPoint point) =>
-            {
-                sender.Send(bytes.ToArray(), point);
-            };
 
             while (true)
             {

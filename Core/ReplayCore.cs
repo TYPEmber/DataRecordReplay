@@ -32,9 +32,11 @@ namespace Core
             return result;
         }
 
-        public ReplayCore(IEnumerable<string> paths, Dictionary<IPEndPoint, IPEndPoint> map)
+        public ReplayCore(IEnumerable<string> paths, Dictionary<IPEndPoint, IPEndPoint> map, DeleSendHandler sendHandler)
         {
             _reader = new Reader(paths);
+
+            _sendHandler = sendHandler;
 
             foreach (var m in map)
             {
@@ -76,7 +78,7 @@ namespace Core
         }
 
         public delegate void DeleSendHandler(ReadOnlySpan<byte> bytes, IPEndPoint point);
-        public DeleSendHandler SendHandler;
+        private DeleSendHandler _sendHandler;
 
         public double SpeedRate { set; get; } = 1;
 
@@ -119,7 +121,7 @@ namespace Core
                             continue;
                         }
 
-                        SendHandler?.Invoke(msg.bytes.Span, point);
+                        _sendHandler?.Invoke(msg.bytes.Span, point);
                     }
 
                     // 缓解内存压力
