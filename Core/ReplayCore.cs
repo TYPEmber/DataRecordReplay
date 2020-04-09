@@ -50,6 +50,8 @@ namespace Core
 
         public File.Info FileInfo { get { return _reader.GetFilesInfo(); } }
 
+        #region Replay Ctrl
+
         Stopwatch _watch = new Stopwatch();
 
         public bool IsPlaying { get { return _watch.IsRunning; } }
@@ -71,11 +73,13 @@ namespace Core
             }
         }
 
+        private bool _flagJump = false;
         public bool JumpTo(long index)
         {
-            _watch.Reset();
+            _flagJump = true;
             return _reader.Set(index);
         }
+        #endregion
 
         public delegate void DeleSendHandler(ReadOnlySpan<byte> bytes, IPEndPoint point);
         private DeleSendHandler _sendHandler;
@@ -112,7 +116,18 @@ namespace Core
                         var sendTiming = (msg.header.time - pkg.time) / SpeedRate;
                         while (_watch.ElapsedMilliseconds / 1000.0 + sleepDelay + sendDelay < sendTiming)
                         {
+                            // 发生跳转
+                            if (_flagJump)
+                            {
+                                break;
+                            }
                             SleepHelper.Delay(sleepDelay);
+                        }
+
+                        // 发生跳转
+                        if (_flagJump)
+                        {
+                            break;
                         }
 
                         _map.TryGetValue(ConverToIP64(msg.header.ip, msg.header.port), out var point);
@@ -129,13 +144,26 @@ namespace Core
 
                     while (_watch.ElapsedMilliseconds / 1000.0 + sleepDelay < _reader.Interval / SpeedRate)
                     {
+                        // 发生跳转
+                        if (_flagJump)
+                        {
+                            break;
+                        }
                         //Logger.Debug.WriteLine(watch.ElapsedMilliseconds);
                         SleepHelper.Delay(sleepDelay);
                     }
 
-                    //TODO: 用事件来向外输出
-                    // Core 中不应该有直接输出
-                    Logger.Debug.WriteLine(pkg.index + " " +_watch.ElapsedMilliseconds);
+                    // 发生跳转
+                    if (_flagJump)
+                    {
+                        _flagJump = false;
+                    }
+                    else
+                    {
+                        //TODO: 用事件来向外输出
+                        // Core 中不应该有直接输出
+                        Logger.Debug.WriteLine(pkg.index + " " + _watch.ElapsedMilliseconds);
+                    }
 
                     _watch.Restart();
                 }
