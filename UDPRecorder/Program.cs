@@ -146,7 +146,14 @@ namespace UDPRecorder
                 }
             }
 
-            _core = new Core.RecordCore(segPara, path, name, notes, points);
+            Core.RecordCore.DeleInfoHandler infoHandler = (Core.RecordCore.ReplayInfo info) =>
+            {
+                Console.WriteLine("Pkg_Count: " + info.count
+                                + " Compress_Rate: " + (info.codedLength * 100.0 / (info.originLength == 0 ? -info.codedLength : info.originLength)).ToString("f2") + "%"
+                                + " Pkg_Time: " + info.pkgTime);
+            };
+
+            _core = new Core.RecordCore(segPara, path, name, notes, points, infoHandler: infoHandler);
 
             // 保证在 core 实例化之后
             // 否则回调函数里的 core 会为 null

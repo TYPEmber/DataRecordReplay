@@ -17,8 +17,10 @@ namespace Core
         private double _intervalTime;
 
         private Writer _writer;
-        public RecordCore(double[] segmentPara, string path, string name, string notes, List<IPEndPoint> points, double intervalTime = 1.0)
+        public RecordCore(double[] segmentPara, string path, string name, string notes, List<IPEndPoint> points, double intervalTime = 1.0, DeleInfoHandler infoHandler = null)
         {
+            _infoHandler = infoHandler;
+
             _intervalTime = intervalTime;
             _startTimeStamp = DateTime.UtcNow.TotalSeconds();
 
@@ -27,12 +29,41 @@ namespace Core
                 points,
                 intervalTime, _startTimeStamp);
 
+            InfoThread();
             ProcessStart();
         }
 
         public void WriteComplete()
         {
             _writer.FlushAndClose();
+        }
+
+        public struct ReplayInfo
+        {
+            public DateTime time;
+            public int count;
+            public int codedLength;
+            public int originLength;
+            public double pkgTime;
+        }
+        private ConcurrentQueue<ReplayInfo> _infos = new ConcurrentQueue<ReplayInfo>();
+        public delegate void DeleInfoHandler(ReplayInfo info);
+        private DeleInfoHandler _infoHandler;
+        private void InfoThread()
+        {
+            Task.Run(() =>
+            {
+                while (true)
+                {
+                    if (_infos.TryDequeue(out ReplayInfo info))
+                    {
+                        _infoHandler?.Invoke(info);
+                        continue;
+                    }
+
+                    SleepHelper.Delay();
+                }
+            });
         }
 
         private ConcurrentQueue<Message> _queue = new ConcurrentQueue<Message>();
@@ -60,11 +91,18 @@ namespace Core
                             {
                                 _writer.Append(pkg);
 
-                                //TODO: 用事件来向外输出
                                 // Core 中不应该有直接输出
-                                Logger.Info.WriteLine("Pkg_Count: " + pkg.MsgCount
-                                                    + " Compress_Rate: " + (pkg.codedLength * 100.0 / (pkg.originLength == 0 ? -pkg.codedLength : pkg.originLength)).ToString("f2") + "%"
-                                                    + " Pkg_Time: " + pkg.time);
+                                //Logger.Info.WriteLine("Pkg_Count: " + pkg.MsgCount
+                                //                    + " Compress_Rate: " + (pkg.codedLength * 100.0 / (pkg.originLength == 0 ? -pkg.codedLength : pkg.originLength)).ToString("f2") + "%"
+                                //                    + " Pkg_Time: " + pkg.time);
+                                _infos.Enqueue(new ReplayInfo()
+                                {
+                                    time = DateTime.UtcNow,
+                                    count = pkg.MsgCount,
+                                    codedLength = pkg.codedLength,
+                                    originLength = pkg.originLength,
+                                    pkgTime = pkg.time
+                                });
 
                                 indexTime += _intervalTime;
 
@@ -92,11 +130,17 @@ namespace Core
                         {
                             _writer.Append(pkg);
 
-                            //TODO: 用事件来向外输出
                             // Core 中不应该有直接输出
-                            Logger.Info.WriteLine("Pkg_Count: " + pkg.MsgCount
-                                                + " Compress_Rate: " + (pkg.codedLength * 100.0 / (pkg.originLength == 0 ? -pkg.codedLength : pkg.originLength)).ToString("f2") + "%"
-                                                + " Pkg_Time: " + pkg.time);
+                            //Logger.Info.WriteLine("Pkg_Count: " + pkg.MsgCount
+                            //                    + " Compress_Rate: " + (pkg.codedLength * 100.0 / (pkg.originLength == 0 ? -pkg.codedLength : pkg.originLength)).ToString("f2") + "%"
+                            //                    + " Pkg_Time: " + pkg.time);
+                            _infos.Enqueue(new ReplayInfo()
+                            {
+                                time = DateTime.UtcNow,
+                                count = pkg.MsgCount,
+                                codedLength = pkg.codedLength,
+                                originLength = pkg.originLength
+                            });
 
                             indexTime += _intervalTime;
 
