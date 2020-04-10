@@ -181,7 +181,7 @@ namespace UDPReplayer
             };
             Core.ReplayCore.DeleInfoHandler infoHandler = (Core.ReplayCore.ReplayInfo info) =>
             {
-                Console.WriteLine(info.time + ": " + (100.0 * (double)info.index / (double)fInfo.totalIndex).ToString("f2") + "%" + " " + info.index + " " + info.pkgCostTime);
+                Console.WriteLine(info.time + ": " + (100.0 * (double)info.index / ((double)fInfo.totalIndex - 1)).ToString("f2") + "%" + " " + info.index + " " + info.pkgCostTime);
             };
 
             // 设置回放的 point map
