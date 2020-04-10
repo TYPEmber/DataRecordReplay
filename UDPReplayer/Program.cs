@@ -170,24 +170,33 @@ namespace UDPReplayer
 
             UDPSender sender = new UDPSender();
 
+            core = new Core.ReplayCore(paths);
+
+            // 获取文件 info
+            var fInfo = core.FileInfo;
+            
             Core.ReplayCore.DeleSendHandler sendHandler = (ReadOnlySpan<byte> bytes, IPEndPoint point) =>
             {
                 sender.Send(bytes.ToArray(), point);
             };
+            Core.ReplayCore.DeleInfoHandler infoHandler = (Core.ReplayCore.ReplayInfo info) =>
+            {
+                Console.WriteLine(info.time + ": " + (100.0 * (double)info.index / (double)fInfo.totalIndex).ToString("f2") + "%" + " " + info.index + " " + info.pkgCostTime);
+            };
 
-            core = new Core.ReplayCore(paths, map, sendHandler);
+            // 设置回放的 point map
+            // 设置回放的 sendHandler 需要注意此处的委托只能做发送 需要尽可能快的返回
+            // 设置回放的 infoHandler 此处是异步触发
+            core.Initial(map, sendHandler, infoHandler);
 
-            // 显示 info
-            var info = core.FileInfo;
+            Logger.Info.WriteLine("TotalIndex: " + fInfo.totalIndex
+                + " StartTime: " + fInfo.time
+                + " TotalTime: " + fInfo.totalIndex * fInfo.timeInterval + "s");
 
-            Logger.Info.WriteLine("TotalIndex: " + info.totalIndex 
-                + " StartTime: " + info.time
-                + " TotalTime: " + info.totalIndex * info.timeInterval + "s");
-
-            Logger.Info.WriteLine("Notes: " + info.notes);
+            Logger.Info.WriteLine("Notes: " + fInfo.notes);
 
             Logger.Info.WriteLine("Maps: ");
-            foreach (var point in info.points)
+            foreach (var point in fInfo.points)
             {
                 if (map.ContainsKey(point))
                 {
@@ -236,7 +245,10 @@ namespace UDPReplayer
                         {
                             per = 0;
                         }
-                        var index = info.totalIndex * per;
+
+                        // 此处需要 -1 才能得到 index
+                        // 因 index 是从 0 开始计算
+                        var index = (fInfo.totalIndex - 1) * per;
                         core.JumpTo((long)index);
                     }
 

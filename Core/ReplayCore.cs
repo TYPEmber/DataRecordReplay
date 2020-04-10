@@ -32,11 +32,34 @@ namespace Core
             return result;
         }
 
-        public ReplayCore(IEnumerable<string> paths, Dictionary<IPEndPoint, IPEndPoint> map, DeleSendHandler sendHandler)
+        private double _sleepDelay = 0.001 / 2.0;
+        public ReplayCore(IEnumerable<string> paths)
         {
             _reader = new Reader(paths);
 
+            // 用于测算当前设备 _sleepDelay
+            Task.Run(() =>
+            {
+                Stopwatch watch = new Stopwatch();
+
+                watch.Start();
+                for (int i = 0; i < 10000; i++)
+                {
+                    SleepHelper.Delay();
+                }
+                watch.Stop();
+
+                _sleepDelay = watch.Elapsed.TotalSeconds / 10000 / 2.0;
+            });
+
+            InfoThread();
+            RePlayThread();
+        }
+
+        public ReplayCore Initial(Dictionary<IPEndPoint, IPEndPoint> map, DeleSendHandler sendHandler, DeleInfoHandler infoHandler)
+        {
             _sendHandler = sendHandler;
+            _infoHandler = infoHandler;
 
             foreach (var m in map)
             {
@@ -45,7 +68,7 @@ namespace Core
                 _map.Add(key, m.Value);
             }
 
-            RePlayThread();
+            return this;
         }
 
         public File.Info FileInfo { get { return _reader.GetFilesInfo(); } }
@@ -54,6 +77,7 @@ namespace Core
 
         Stopwatch _watch = new Stopwatch();
 
+        public double SpeedRate { set; get; } = 1;
         public bool IsPlaying { get { return _watch.IsRunning; } }
         // 播放/暂停
         public void P()
@@ -64,35 +88,65 @@ namespace Core
             }
             else
             {
-                // 保证缓冲队列有数据
-                while (_reader.Peek() == null)
-                {
-                    SleepHelper.Delay(1);
-                }
                 _watch.Start();
             }
         }
 
-        private bool _flagJump = false;
+        private bool _signalEnd = false;
+        private bool _signalJump = false;
         public bool JumpTo(long index)
         {
-            _flagJump = true;
-            return _reader.Set(index);
+            _signalJump = _reader.Set(index);
+
+            return _signalJump;
         }
         #endregion
 
+        public struct ReplayInfo
+        {
+            public DateTime time;
+            public long index;
+            public double pkgCostTime;
+        }
+        private ConcurrentQueue<ReplayInfo> _infos = new ConcurrentQueue<ReplayInfo>();
+        public delegate void DeleInfoHandler(ReplayInfo info);
+        private DeleInfoHandler _infoHandler;
         public delegate void DeleSendHandler(ReadOnlySpan<byte> bytes, IPEndPoint point);
         private DeleSendHandler _sendHandler;
 
-        public double SpeedRate { set; get; } = 1;
+        private void InfoThread()
+        {
+            Task.Run(() =>
+            {
+                while (true)
+                {
+                    if (_infos.TryDequeue(out ReplayInfo info))
+                    {
+                        _infoHandler?.Invoke(info);
+                        continue;
+                    }
+
+                    SleepHelper.Delay();
+                }
+            });
+        }
 
         private void RePlayThread()
         {
             Task.Run(() =>
             {
-                //TODO: 对 delay 进行测算
-                double sleepDelay = 0.0005;
                 double sendDelay = 0.000005;
+                _signalJump = false;
+                _signalEnd = false;
+
+                if (_watch.IsRunning)
+                {
+                    _watch.Restart();
+                }
+                else
+                {
+                    _watch.Reset();
+                }
 
                 while (true)
                 {
@@ -100,34 +154,37 @@ namespace Core
 
                     if (pkg == null)
                     {
-                        SleepHelper.Delay(1);
+                        if (_signalEnd || _signalJump)
+                        {
+                            if (_watch.IsRunning)
+                            {
+                                _watch.Restart();
+                            }
+                            else
+                            {
+                                _watch.Reset();
+                            }
+
+                            _signalJump = false;
+                        }
+                        SleepHelper.Delay();
                         continue;
                     }
 
-                    // 播放完毕
-                    if (pkg.index >= _reader.Count)
-                    {
-                        SleepHelper.Delay(1);
-                        continue;
-                    }
+                    //Logger.Debug.WriteLine(pkg.index);
 
                     foreach (var msg in pkg.GetMessages())
                     {
                         var sendTiming = (msg.header.time - pkg.time) / SpeedRate;
-                        while (_watch.ElapsedMilliseconds / 1000.0 + sleepDelay + sendDelay < sendTiming)
-                        {
-                            // 发生跳转
-                            if (_flagJump)
-                            {
-                                break;
-                            }
-                            SleepHelper.Delay(sleepDelay);
-                        }
 
-                        // 发生跳转
-                        if (_flagJump)
+                        while (_watch.Elapsed.TotalSeconds + _sleepDelay + sendDelay < sendTiming)
                         {
-                            break;
+                            if (_signalJump)
+                            {
+                                RePlayThread();
+                                return;
+                            }
+                            SleepHelper.Delay();
                         }
 
                         _map.TryGetValue(ConverToIP64(msg.header.ip, msg.header.port), out var point);
@@ -139,35 +196,44 @@ namespace Core
                         _sendHandler?.Invoke(msg.bytes.Span, point);
                     }
 
-                    // 缓解内存压力
-                    _reader.Return(ref pkg);
-
-                    while (_watch.ElapsedMilliseconds / 1000.0 + sleepDelay < _reader.Interval / SpeedRate)
+                    // 发送下一个 pkg 之前的延时
+                    while (_watch.Elapsed.TotalSeconds + _sleepDelay < _reader.Interval / SpeedRate)
                     {
-                        // 发生跳转
-                        if (_flagJump)
+                        if (_signalJump)
                         {
-                            break;
+                            RePlayThread();
+                            return;
                         }
-                        //Logger.Debug.WriteLine(watch.ElapsedMilliseconds);
-                        SleepHelper.Delay(sleepDelay);
+                        SleepHelper.Delay();
                     }
 
-                    // 发生跳转
-                    if (_flagJump)
+
+                    // Core 中不应该有直接输出
+                    //Logger.Debug.WriteLine(pkg.index + " " + _watch.Elapsed.TotalSeconds);
+                    _infos.Enqueue(new ReplayInfo()
                     {
-                        _flagJump = false;
+                        time = DateTime.UtcNow,
+                        index = pkg.index,
+                        pkgCostTime = _watch.Elapsed.TotalSeconds
+                    });
+
+
+                    // 播放完毕
+                    if (pkg.index >= _reader.Count - 1)
+                    {
+                        _signalEnd = true;
                     }
                     else
                     {
-                        //TODO: 用事件来向外输出
-                        // Core 中不应该有直接输出
-                        Logger.Debug.WriteLine(pkg.index + " " + _watch.ElapsedMilliseconds);
+                        _signalEnd = false;
                     }
+
+                    // 需要在所有使用 pkg 的代码完成后再归还
+                    // 缓解内存压力
+                    _reader.Return(ref pkg);
 
                     _watch.Restart();
                 }
-
             });
         }
     }

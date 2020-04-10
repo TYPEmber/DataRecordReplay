@@ -16,5 +16,10 @@ namespace DRRCommon
         {
             _socket.Poll((int)(seconds * 1000 * 1000), SelectMode.SelectRead);
         }
+
+        public static void Delay()
+        {
+            _socket.Poll(1, SelectMode.SelectRead);
+        }
     }
 }

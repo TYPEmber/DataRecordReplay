@@ -50,7 +50,7 @@ namespace FileManager
             var info = _current.GetInfo();
 
             info.time = StartTime;
-            info.totalIndex = this.Count; 
+            info.totalIndex = this.Count;
 
             return info;
         }
@@ -74,6 +74,8 @@ namespace FileManager
             PackagePool.Return(ref pkg);
         }
 
+        private object _lockerCurrentIndex = new object();
+
         public bool Set(long index)
         {
             _buffer.TryPeek(out Package pkg);
@@ -87,15 +89,13 @@ namespace FileManager
                 }
             }
 
-
-            // 缓冲队列清空
-            _buffer.Clear();
-
             if (_index.Convert(index, out File current, out int oindex))
             {
                 _currentIndex = index;
                 _current = current;
                 _current.Locate(oindex);
+
+                _buffer.Clear();
 
                 return true;
             }
@@ -138,41 +138,47 @@ namespace FileManager
         ConcurrentQueue<Package> _buffer = new ConcurrentQueue<Package>();
         private void BufferThread()
         {
+            int bufferSize = 3;
             Task.Run(() =>
             {
                 while (true)
                 {
-                    if (_buffer.Count <= 3)
+                    if (_buffer.Count <= bufferSize)
                     {
                         Package pkg = PackagePool.Rent();
                         //Package pkg = new Package();
 
-                        this.ReadFile(ref pkg);
-
-                        if (pkg == null)
+                        lock (_lockerCurrentIndex)
                         {
-                            SleepHelper.Delay(1);
-                            continue;
+                            this.ReadFile(ref pkg);
+
+                            if (pkg == null)
+                            {
+                                SleepHelper.Delay();
+                                continue;
+                            }
+
+                            pkg.index = _currentIndex;
+                            pkg.time = pkg.index * _current.header.timeInterval + _current.header.time;
+
+                            EDCoder.Decoder.GetMessages(ref pkg);
+
+                            _buffer.Enqueue(pkg);
+
+                            //减少内存占用
+                            //Console.WriteLine(GC.GetTotalMemory(false) - 10 * (pkg.codedBytes.Length + pkg.originBytes.Length + pkg.msgsAsBytesLength));
+                            if (GC.GetTotalMemory(false) > bufferSize * (pkg.codedBytes.Length + pkg.originBytes.Length + pkg.msgsAsBytesLength))
+                            {
+                                GC.Collect();
+                            }
+
+                            _currentIndex++;
                         }
-
-                        pkg.index = _currentIndex;
-                        pkg.time = pkg.index * _current.header.timeInterval + _current.header.time;
-
-                        EDCoder.Decoder.GetMessages(ref pkg);
-
-                        _buffer.Enqueue(pkg);
-
-                        //减少内存占用
-                        //Console.WriteLine(GC.GetTotalMemory(false) - 10 * (pkg.codedBytes.Length + pkg.originBytes.Length + pkg.msgsAsBytesLength));
-                        if (GC.GetTotalMemory(false) > 3 * (pkg.codedBytes.Length + pkg.originBytes.Length + pkg.msgsAsBytesLength))
-                        {
-                            GC.Collect();
-                        }
-
-                        _currentIndex++;
                     }
-
-                    SleepHelper.Delay(10);
+                    else
+                    {
+                        SleepHelper.Delay();
+                    }
                 }
             });
         }
@@ -192,7 +198,7 @@ namespace FileManager
 
                         if (pkg == null)
                         {
-                            SleepHelper.Delay(1);
+                            SleepHelper.Delay();
                             continue;
                         }
 
@@ -213,7 +219,7 @@ namespace FileManager
                         _currentIndex++;
                     }
 
-                    SleepHelper.Delay(10);
+                    SleepHelper.Delay();
                 }
             });
         }
