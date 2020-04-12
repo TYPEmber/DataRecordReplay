@@ -45,7 +45,7 @@ A pure .net core UDP Record&amp;Replay tool.
 指定记录文件备注，默认值为 ""
 ```
 -n [interval]
--n This is a notes!    指定该记录文件的备注为 "This is a notes!"
+-n This is a note!    指定该记录文件的备注为 "This is a note!"
 ```
 
 ### UDPReplayer
