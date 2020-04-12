@@ -59,6 +59,14 @@ A pure .net core UDP Record&amp;Replay tool.
 ## Core
 提供核心功能的实现
 ### RecordCore
+本模块提供数据记录的核心方法
+使用流程如下：
+实例化 RecordCore 对象
+```
+RecordCore(double[] segmentPara, string path, string name, string notes, List<IPEndPoint> points, double intervalTime = 1.0, DeleInfoHandler infoHandler = null);
+
+```
+
 ### ReplayCore
 ### EditCore
 
