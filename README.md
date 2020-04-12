@@ -3,8 +3,6 @@ A pure .net core UDP Record&amp;Replay tool.
 
 本项目是一个完全基于 .Net Core 实现的 UDP 报文记录、回放、编辑的工具。
 
-可同步记录从多个被监听的网络地址收到的 UDP 报文，并可按照指定时长（默认为 1s）打包压缩。同时在写入文件的时候可以定制
-
 ## Console Tools
 ### UDPRecorder
 本模块用于记录 UDP 报文
@@ -51,7 +49,12 @@ A pure .net core UDP Record&amp;Replay tool.
 ```
 
 ### UDPReplayer
+本模块用于回放记录的 UDP 报文
+
+
+
 ### UDPEditor
+本模块用于编辑记录文件
 
 ## Core
 提供核心功能的实现
