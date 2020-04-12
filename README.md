@@ -61,3 +61,9 @@ A pure .net core UDP Record&amp;Replay tool.
 ### RecordCore
 ### ReplayCore
 ### EditCore
+
+## FileManager
+提供记录文件读写以及跨文件 index 管理
+
+## EDCoder
+提供数据压缩、解压能力
