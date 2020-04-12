@@ -60,11 +60,41 @@ A pure .net core UDP Record&amp;Replay tool.
 提供核心功能的实现
 ### RecordCore
 本模块提供数据记录的核心方法
+
 使用流程如下：
+
 实例化 RecordCore 对象
 ```
-RecordCore(double[] segmentPara, string path, string name, string notes, List<IPEndPoint> points, double intervalTime = 1.0, DeleInfoHandler infoHandler = null);
+RecordCore(double[] segmentPara, string path, string name, string notes, List<IPEndPoint> points, double intervalTime = 1.0, DeleInfoHandler infoHandler = null)
 
+segmentPara: 文件分段参数 [size time] 每段文件大小不超过 size MB，时长不超过 time s，0 表示该项无效 
+path:文件存储路径
+name:文件名
+notes:文件备注
+points:监听端口列表
+intervalTime:打包压缩间隔时长，默认 1s
+infoHandler:core 中运行信息委托
+
+var core = new Core.RecordCore(segPara, path, name, notes, points, intervalTime: _intervalTime infoHandler: _infoHandler);
+```
+
+传入 UDP 报文
+```
+void Add(double time, byte[] ip, ushort port, byte[] bytes)
+
+time:本条报文接受时戳（当前 UTC 时间距 1970-01-01 的总秒数）
+ip:本条报文来自该监听 ip
+port:本条报文来自该监听 端口
+bytes:UDP 报文
+
+core.Add(time.TotalSeconds(), point.Address.GetAddressBytes(), (ushort)point.Port, rcvBytes);
+```
+
+结束记录
+```
+void WriteComplete()
+
+core.WriteComplete();
 ```
 
 ### ReplayCore
