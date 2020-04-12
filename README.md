@@ -39,13 +39,13 @@ A pure .net core UDP Record&amp;Replay tool.
 -i [interval]
 -i 1       每隔 1.0s 打包压缩一次
 -i 1.0     每隔 1.0s 打包压缩一次
--i 2.57    每隔 2.57s 打包压缩一次
+-i 2.18    每隔 2.18s 打包压缩一次
 ```
 
 指定记录文件备注，默认值为 ""
 ```
 -n [interval]
--n This is a note!    指定该记录文件的备注为 "This is a note!"
+-n You know where you hope this train will take you...but you can't konw for sure.    指定该记录文件的备注为 "You know where you hope this train will take you...but you can't konw for sure."
 ```
 
 ### UDPReplayer
