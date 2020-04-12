@@ -44,7 +44,7 @@ A pure .net core UDP Record&amp;Replay tool.
 
 指定记录文件备注，默认值为 ""
 ```
--n [interval]
+-n [note]
 -n You know where you hope this train will take you...but you can't konw for sure.    指定该记录文件的备注为 "You know where you hope this train will take you...but you can't konw for sure."
 ```
 
