@@ -98,6 +98,9 @@ core.WriteComplete();
 ```
 
 ### ReplayCore
+本模块提供数据回放的核心方法
+
+
 ### EditCore
 
 ## FileManager
