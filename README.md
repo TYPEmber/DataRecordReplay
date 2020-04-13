@@ -56,6 +56,8 @@ A pure .net core UDP Record&amp;Replay tool.
 ### UDPEditor
 本模块用于编辑记录文件
 
+---
+
 ## Core
 提供核心功能的实现
 ### RecordCore
@@ -200,7 +202,7 @@ core.Initial(_map, _sendHandler, _infoHandler);
 ```
 void P()                                       播放/暂停
 bool JumpTo(long index)                        跳转至 index 处
-double SpeedRate                               播放倍率，默认为 1
+double SpeedRate                               播放倍率，默认为 1.0
 bool IsPlaying                                 播放状态
 ```
 
@@ -252,6 +254,20 @@ class File.Info
 }
 
 var fileInfo = core.FileInfo;
+```
+
+裁切
+```
+void Clip(long startIndex, long endIndex, double[] segmentPara, string path, string name, string notes = null)
+
+startIndex: 起始 index，不小于 0
+endIndex: 结束 index，不大于总长
+segmentPara: 文件分段参数 [size time] 每段文件大小不超过 size MB，时长不超过 time s，0 表示该项无效 
+path: 文件存储路径
+name: 文件名
+notes: 文件备注
+
+core.Clip(0, 481, new double[] { 100, 600 }, _path, _name);
 ```
 
 ## FileManager
