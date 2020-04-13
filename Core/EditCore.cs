@@ -40,7 +40,7 @@ namespace Core
 
                 if (pkg == null)
                 {
-                    SleepHelper.Delay(1);
+                    SleepHelper.Delay();
                     continue;
                 }
 
