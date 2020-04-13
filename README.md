@@ -73,7 +73,30 @@ name: 文件名
 notes: 文件备注
 points: 监听端口列表
 intervalTime: 打包压缩间隔时长，默认 1s
-infoHandler: 指定 core 中运行信息处理委托
+infoHandler: 指定 core 中运行信息处理委托 delegate void DeleInfoHandler(ReplayInfo info)
+struct ReplayInfo
+{
+    /// <summary>
+    /// 当前 UTC 时间戳
+    /// </summary>
+    public DateTime time;
+    /// <summary>
+    /// 当前 pkg 中 msg 数量
+    /// </summary>
+    public int count;
+    /// <summary>
+    /// 当前 pkg 压缩后大小
+    /// </summary>
+    public int codedLength;
+    /// <summary>
+    /// 当前 pkg 未压缩大小
+    /// </summary>
+    public int originLength;
+    /// <summary>
+    /// 当前 pkg 生成 UTC 时间戳
+    /// </summary>
+    public double pkgTime;
+}
 
 var core = new Core.RecordCore(segPara, path, name, notes, points, intervalTime: _intervalTime infoHandler: _infoHandler);
 ```
@@ -153,17 +176,34 @@ var fileInfo = core.FileInfo;
 ReplayCore Initial(Dictionary<IPEndPoint, IPEndPoint> map, DeleSendHandler sendHandler, DeleInfoHandler infoHandler)
 
 map: 指定将从 key 地址接收到的数据发送至 value 地址
-sendHandler: 指定数据发送委托，需尽快返回
-infoHandler: 指定 core 中运行信息处理委托
+sendHandler: 指定数据发送委托，需尽快返回 delegate void DeleSendHandler(ReadOnlySpan<byte> bytes, IPEndPoint point)
+infoHandler: 指定 core 中运行信息处理委托 delegate void DeleInfoHandler(ReplayInfo info)
+struct ReplayInfo
+{
+    /// <summary>
+    /// 当前 UTC 时间戳
+    /// </summary>
+    public DateTime time;
+    /// <summary>
+    /// 已播放完成的 pkg 的 index 编号
+    /// </summary>
+    public long index;
+    /// <summary>
+    /// 已播放完成的 pkg 播放耗时
+    /// </summary>
+    public double pkgCostTime;
+}
 
 core.Initial(_map, _sendHandler, _infoHandler);
 ```
 
 播放控制
 ```
-
+void P()                                       播放/暂停
+bool JumpTo(long index)                        跳转至 index 处
+double SpeedRate                               播放倍率，默认为 1
+bool IsPlaying                                 播放状态
 ```
-
 
 ### EditCore
 
