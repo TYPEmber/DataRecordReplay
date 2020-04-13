@@ -101,6 +101,47 @@ c           Close           按下 y 即为结束回放 按下其余任意键则
 ### UDPEditor
 本模块用于编辑记录文件
 
+指定单个文件
+```
+-f [fileName]
+-f data.lcl             指定回放文件为程序运行目录下的 data.lcl
+-f save/data.lcl        指定回放文件为程序运行目录下的 save/data.lcl
+```
+
+加载文件夹
+```
+-p [folderNmae]
+-p /                    指定从程序运行目录下加载其中所有的记录文件
+-p save/data/           指定从程序运行目录下的 save/data/ 加载其中所有的记录文件
+```
+
+指定记录文件切分规则，默认值为 [2048 3600]
+```
+-s [size time]
+-s "500 3600"     单个文件不超过 500MB 且记录时长不超过 3600s
+-s "500 0"        单个文件不超过 500MB
+-s "0 0"          不做任何切分
+```
+
+指定文件截取选段
+```
+-r [startIndex endIndex]
+-r "0 480"          截取源文件中 Index 范围为 0 至 480 的片段
+-r "50 58"          截取源文件中 Index 范围为 50 至 58 的片段
+```
+
+指定记录文件路径及文件名
+```
+-p [path]，默认值为 [/Clip_yyyy-MM-dd_HH-mm-ss/]
+-p saveudp/clip/          指定文件写入到程序运行路径下的 saveudp/save/ 文件夹中
+
+-f [name]，默认值为 [data]
+-f clipFile                   指定文件名为 clipFile
+
+-f data                        指定将文件名为 data.lcl 的记录文件写入到程序运行路径下的 Clip_yyyy-MM-dd_HH-mm-ss/ 文件夹中
+-p saveudp/clip/ -f clipFile   指定将文件名为 clipFile.lcl 的记录文件写入到程序运行路径下的 saveudp/clip/ 文件夹中
+```
+
 ---
 
 ## Core
