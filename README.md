@@ -167,7 +167,6 @@ class File.Info
     public long totalIndex { set; get; }
 }
 
-var core = ReplayCore(paths);
 var fileInfo = core.FileInfo;
 ```
 
@@ -206,6 +205,54 @@ bool IsPlaying                                 播放状态
 ```
 
 ### EditCore
+本模块提供记录文件编辑的核心方法
+
+使用流程如下:
+
+实例化 EditCore 对象
+```
+EditCore(IEnumerable<string> paths)
+
+paths: 待回放文件队列，传入后会自动拼接，并建立统一索引
+
+var core = EditCore(paths);
+```
+
+获取文件信息
+```
+File.Info FileInfo
+
+class File.Info
+ {
+    public int version_file;
+    public int version_code;
+    /// <summary>
+    /// 起始时间
+    /// 当前 UTC 时间从 1970-01-01 的总秒数
+    /// 单位：s
+    /// </summary>
+    public double time;
+    /// <summary>
+    /// 每个 pkg 时间跨度
+    /// 单位：s
+    /// </summary>
+    public double timeInterval;
+    /// <summary>
+    /// 该 File 记录的是从这些 IPEndPoint 中收到到的数据
+    /// </summary>
+    public IPEndPoint[] points { set; get; }
+    /// <summary>
+    /// 备注
+    /// </summary>
+    public string notes { set; get; }
+    /// <summary>
+    /// 总 index 数量
+    /// </summary>
+    public long totalIndex { set; get; }
+}
+
+var fileInfo = core.FileInfo;
+```
 
 ## FileManager
 提供记录文件读写以及跨文件 index 管理
