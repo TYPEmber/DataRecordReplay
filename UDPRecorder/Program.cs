@@ -168,14 +168,28 @@ namespace UDPRecorder
 
                 if (key.Key == ConsoleKey.C)
                 {
-                    foreach (var rec in _recivers)
+                    Logger.Info.WriteLine();
+                    Logger.Info.WriteLine("Close?");
+
+                    var k = Console.ReadKey();
+
+                    if (k.Key == ConsoleKey.Y)
                     {
-                        rec.Stop();
+                        foreach (var rec in _recivers)
+                        {
+                            rec.Stop();
+                        }
+
+                        _core.WriteComplete();
+                        Logger.Info.WriteLine("Record Completed!");
+
+                        return;
                     }
-
-                    _core.WriteComplete();
-
-                    return;
+                    else
+                    {
+                        // 换行
+                        Logger.Info.WriteLine();
+                    }
                 }
             }
         }

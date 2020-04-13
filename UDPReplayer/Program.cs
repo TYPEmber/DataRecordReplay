@@ -307,6 +307,11 @@ namespace UDPReplayer
                     {
                         return;
                     }
+                    else
+                    {
+                        // 换行
+                        Logger.Info.WriteLine();
+                    }
 
                     if (flag)
                     {
