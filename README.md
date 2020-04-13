@@ -68,12 +68,12 @@ A pure .net core UDP Record&amp;Replay tool.
 RecordCore(double[] segmentPara, string path, string name, string notes, List<IPEndPoint> points, double intervalTime = 1.0, DeleInfoHandler infoHandler = null)
 
 segmentPara: 文件分段参数 [size time] 每段文件大小不超过 size MB，时长不超过 time s，0 表示该项无效 
-path:文件存储路径
-name:文件名
-notes:文件备注
-points:监听端口列表
-intervalTime:打包压缩间隔时长，默认 1s
-infoHandler:core 中运行信息委托
+path: 文件存储路径
+name: 文件名
+notes: 文件备注
+points: 监听端口列表
+intervalTime: 打包压缩间隔时长，默认 1s
+infoHandler: 指定 core 中运行信息处理委托
 
 var core = new Core.RecordCore(segPara, path, name, notes, points, intervalTime: _intervalTime infoHandler: _infoHandler);
 ```
@@ -149,6 +149,17 @@ var fileInfo = core.FileInfo;
 ```
 
 初始化 ReplayCore
+```
+ReplayCore Initial(Dictionary<IPEndPoint, IPEndPoint> map, DeleSendHandler sendHandler, DeleInfoHandler infoHandler)
+
+map: 指定将从 key 地址接收到的数据发送至 value 地址
+sendHandler: 指定数据发送委托，需尽快返回
+infoHandler: 指定 core 中运行信息处理委托
+
+core.Initial(_map, _sendHandler, _infoHandler);
+```
+
+播放控制
 ```
 
 ```
