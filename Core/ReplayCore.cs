@@ -104,8 +104,17 @@ namespace Core
 
         public struct ReplayInfo
         {
+            /// <summary>
+            /// 当前 UTC 时间戳
+            /// </summary>
             public DateTime time;
+            /// <summary>
+            /// 已播放完成的 pkg 的 index 编号
+            /// </summary>
             public long index;
+            /// <summary>
+            /// 已播放完成的 pkg 播放耗时
+            /// </summary>
             public double pkgCostTime;
         }
         private ConcurrentQueue<ReplayInfo> _infos = new ConcurrentQueue<ReplayInfo>();

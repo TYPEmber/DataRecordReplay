@@ -40,10 +40,25 @@ namespace Core
 
         public struct ReplayInfo
         {
+            /// <summary>
+            /// 当前 UTC 时间戳
+            /// </summary>
             public DateTime time;
+            /// <summary>
+            /// 当前 pkg 中 msg 数量
+            /// </summary>
             public int count;
+            /// <summary>
+            /// 当前 pkg 压缩后大小
+            /// </summary>
             public int codedLength;
+            /// <summary>
+            /// 当前 pkg 未压缩大小
+            /// </summary>
             public int originLength;
+            /// <summary>
+            /// 当前 pkg 生成 UTC 时间戳
+            /// </summary>
             public double pkgTime;
         }
         private ConcurrentQueue<ReplayInfo> _infos = new ConcurrentQueue<ReplayInfo>();
