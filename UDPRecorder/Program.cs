@@ -29,7 +29,7 @@ namespace UDPRecorder
             Logger.Info.WriteLine("Initial Reciver Success! Listen On " + ip + ":" + port);
         }
 
-        static void Main(string[] args)
+        static void LoadPara(string[] args)
         {
             if (args.Length % 2 != 0)
             {
@@ -161,6 +161,11 @@ namespace UDPRecorder
             {
                 rec.Start();
             }
+        }
+
+        static void Main(string[] args)
+        {
+            LoadPara(args);
 
             while (true)
             {

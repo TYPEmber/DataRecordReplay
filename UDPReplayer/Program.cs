@@ -46,7 +46,7 @@ namespace UDPReplayer
             }
         }
 
-        static void Main(string[] args)
+        static void LoadPara(string[] args)
         {
             if (args.Length % 2 != 0)
             {
@@ -174,7 +174,7 @@ namespace UDPReplayer
 
             // 获取文件 info
             var fInfo = core.FileInfo;
-            
+
             Core.ReplayCore.DeleSendHandler sendHandler = (ReadOnlySpan<byte> bytes, IPEndPoint point) =>
             {
                 sender.Send(bytes.ToArray(), point);
@@ -207,6 +207,11 @@ namespace UDPReplayer
                     Logger.Info.WriteLine(point + " => ");
                 }
             }
+        }
+
+        static void Main(string[] args)
+        {
+            LoadPara(args);
 
             while (true)
             {
