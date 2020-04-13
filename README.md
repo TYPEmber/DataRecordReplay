@@ -48,10 +48,55 @@ A pure .net core UDP Record&amp;Replay tool.
 -n You know where you hope this train will take you...but you can't konw for sure.    指定该记录文件的备注为 "You know where you hope this train will take you...but you can't konw for sure."
 ```
 
+运行中控制指令
+```
+c           Close           按下 y 即为结束录制 按下其余任意键则为取消
+```
+
 ### UDPReplayer
 本模块用于回放记录的 UDP 报文
 
+指定回放配置参数文件
+```
+-t [paraFile]
+-t para.txt             指定回放配置参数文件为程序运行目录下的 para.txt
+-t save/para/para.txt   指定回放配置参数文件为程序运行目录下的 save/para/para.txt
+```
 
+若不指定回放配置参数文件，且不指定任何参数，则等同于
+``` 
+-t para.txt
+```
+
+指定单个文件
+```
+-f [fileName]
+-f data.lcl             指定回放文件为程序运行目录下的 data.lcl
+-f save/data.lcl        指定回放文件为程序运行目录下的 save/data.lcl
+```
+
+加载文件夹
+```
+-p [folderNmae]
+-p /                    指定从程序运行目录下加载其中所有的记录文件
+-p save/data/           指定从程序运行目录下的 save/data/ 加载其中所有的记录文件
+```
+
+加载映射关系
+```
+-m [record=>replay]
+-m "5503=>127.0.0.1:5503"                                       将记录文件中 0.0.0.0:5503 的数据映射至 127.0.0.1：5503
+-m "127.0.0.1:5503=>192.168.1.1:5503"                           将记录文件中 127.0.0.1:5503 的数据映射至 192.168.1.1:5503
+-m "5503=>127.0.0.1:5503 192.168.1.1:8912=>127.0.0.1:8912"      将记录文件中 0.0.0.0:5503 的数据映射至 127.0.0.1：5503 将记录文件中 192.168.1.1:8912 的数据映射至 127.0.0.1:8912
+```
+
+运行中控制指令
+```
+p           Play/Pause
+j           JumpTo          输入 50% 即为跳转至 50%处
+r           Rate            输入 5.5 即为播放速度为 5.5 倍
+c           Close           按下 y 即为结束回放 按下其余任意键则为取消
+```
 
 ### UDPEditor
 本模块用于编辑记录文件
