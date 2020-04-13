@@ -68,12 +68,35 @@ A pure .net core UDP Record&amp;Replay tool.
 RecordCore(double[] segmentPara, string path, string name, string notes, List<IPEndPoint> points, double intervalTime = 1.0, DeleInfoHandler infoHandler = null)
 
 segmentPara: 文件分段参数 [size time] 每段文件大小不超过 size MB，时长不超过 time s，0 表示该项无效 
-path:文件存储路径
-name:文件名
-notes:文件备注
-points:监听端口列表
-intervalTime:打包压缩间隔时长，默认 1s
-infoHandler:core 中运行信息委托
+path: 文件存储路径
+name: 文件名
+notes: 文件备注
+points: 监听端口列表
+intervalTime: 打包压缩间隔时长，默认 1s
+infoHandler: 指定 core 中运行信息处理委托 delegate void DeleInfoHandler(ReplayInfo info)
+struct ReplayInfo
+{
+    /// <summary>
+    /// 当前 UTC 时间戳
+    /// </summary>
+    public DateTime time;
+    /// <summary>
+    /// 当前 pkg 中 msg 数量
+    /// </summary>
+    public int count;
+    /// <summary>
+    /// 当前 pkg 压缩后大小
+    /// </summary>
+    public int codedLength;
+    /// <summary>
+    /// 当前 pkg 未压缩大小
+    /// </summary>
+    public int originLength;
+    /// <summary>
+    /// 当前 pkg 生成 UTC 时间戳
+    /// </summary>
+    public double pkgTime;
+}
 
 var core = new Core.RecordCore(segPara, path, name, notes, points, intervalTime: _intervalTime infoHandler: _infoHandler);
 ```
@@ -82,10 +105,10 @@ var core = new Core.RecordCore(segPara, path, name, notes, points, intervalTime:
 ```
 void Add(double time, byte[] ip, ushort port, byte[] bytes)
 
-time:本条报文接受时戳（当前 UTC 时间距 1970-01-01 的总秒数）
-ip:本条报文来自该监听 ip
-port:本条报文来自该监听 端口
-bytes:UDP 报文
+time: 本条报文接受时戳（当前 UTC 时间距 1970-01-01 的总秒数）
+ip: 本条报文来自该监听 ip
+port: 本条报文来自该监听 端口
+bytes: UDP 报文
 
 core.Add(time.TotalSeconds(), point.Address.GetAddressBytes(), (ushort)point.Port, rcvBytes);
 ```
@@ -98,6 +121,90 @@ core.WriteComplete();
 ```
 
 ### ReplayCore
+本模块提供数据回放的核心方法
+
+使用流程如下：
+
+实例化 ReplayCore 对象
+```
+ReplayCore(IEnumerable<string> paths)
+
+paths: 待回放文件队列，传入后会自动拼接，并建立统一索引
+
+var core = ReplayCore(paths);
+```
+
+获取文件信息
+```
+File.Info FileInfo
+
+class File.Info
+ {
+    public int version_file;
+    public int version_code;
+    /// <summary>
+    /// 起始时间
+    /// 当前 UTC 时间从 1970-01-01 的总秒数
+    /// 单位：s
+    /// </summary>
+    public double time;
+    /// <summary>
+    /// 每个 pkg 时间跨度
+    /// 单位：s
+    /// </summary>
+    public double timeInterval;
+    /// <summary>
+    /// 该 File 记录的是从这些 IPEndPoint 中收到到的数据
+    /// </summary>
+    public IPEndPoint[] points { set; get; }
+    /// <summary>
+    /// 备注
+    /// </summary>
+    public string notes { set; get; }
+    /// <summary>
+    /// 总 index 数量
+    /// </summary>
+    public long totalIndex { set; get; }
+}
+
+var core = ReplayCore(paths);
+var fileInfo = core.FileInfo;
+```
+
+初始化 ReplayCore
+```
+ReplayCore Initial(Dictionary<IPEndPoint, IPEndPoint> map, DeleSendHandler sendHandler, DeleInfoHandler infoHandler)
+
+map: 指定将从 key 地址接收到的数据发送至 value 地址
+sendHandler: 指定数据发送委托，需尽快返回 delegate void DeleSendHandler(ReadOnlySpan<byte> bytes, IPEndPoint point)
+infoHandler: 指定 core 中运行信息处理委托 delegate void DeleInfoHandler(ReplayInfo info)
+struct ReplayInfo
+{
+    /// <summary>
+    /// 当前 UTC 时间戳
+    /// </summary>
+    public DateTime time;
+    /// <summary>
+    /// 已播放完成的 pkg 的 index 编号
+    /// </summary>
+    public long index;
+    /// <summary>
+    /// 已播放完成的 pkg 播放耗时
+    /// </summary>
+    public double pkgCostTime;
+}
+
+core.Initial(_map, _sendHandler, _infoHandler);
+```
+
+播放控制
+```
+void P()                                       播放/暂停
+bool JumpTo(long index)                        跳转至 index 处
+double SpeedRate                               播放倍率，默认为 1
+bool IsPlaying                                 播放状态
+```
+
 ### EditCore
 
 ## FileManager
