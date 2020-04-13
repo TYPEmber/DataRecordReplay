@@ -82,10 +82,10 @@ var core = new Core.RecordCore(segPara, path, name, notes, points, intervalTime:
 ```
 void Add(double time, byte[] ip, ushort port, byte[] bytes)
 
-time:本条报文接受时戳（当前 UTC 时间距 1970-01-01 的总秒数）
-ip:本条报文来自该监听 ip
-port:本条报文来自该监听 端口
-bytes:UDP 报文
+time: 本条报文接受时戳（当前 UTC 时间距 1970-01-01 的总秒数）
+ip: 本条报文来自该监听 ip
+port: 本条报文来自该监听 端口
+bytes: UDP 报文
 
 core.Add(time.TotalSeconds(), point.Address.GetAddressBytes(), (ushort)point.Port, rcvBytes);
 ```
@@ -99,6 +99,59 @@ core.WriteComplete();
 
 ### ReplayCore
 本模块提供数据回放的核心方法
+
+使用流程如下：
+
+实例化 ReplayCore 对象
+```
+ReplayCore(IEnumerable<string> paths)
+
+paths: 待回放文件队列，传入后会自动拼接，并建立统一索引
+
+var core = ReplayCore(paths);
+```
+
+获取文件信息
+```
+File.Info FileInfo
+
+class File.Info
+ {
+    public int version_file;
+    public int version_code;
+    /// <summary>
+    /// 起始时间
+    /// 当前 UTC 时间从 1970-01-01 的总秒数
+    /// 单位：s
+    /// </summary>
+    public double time;
+    /// <summary>
+    /// 每个 pkg 时间跨度
+    /// 单位：s
+    /// </summary>
+    public double timeInterval;
+    /// <summary>
+    /// 该 File 记录的是从这些 IPEndPoint 中收到到的数据
+    /// </summary>
+    public IPEndPoint[] points { set; get; }
+    /// <summary>
+    /// 备注
+    /// </summary>
+    public string notes { set; get; }
+    /// <summary>
+    /// 总 index 数量
+    /// </summary>
+    public long totalIndex { set; get; }
+}
+
+var core = ReplayCore(paths);
+var fileInfo = core.FileInfo;
+```
+
+初始化 ReplayCore
+```
+
+```
 
 
 ### EditCore
