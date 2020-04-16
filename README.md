@@ -7,6 +7,9 @@ A pure .net core UDP Record&amp;Replay tool.
 ### UDPRecorder
 本模块用于记录 UDP 报文
 
+UDPRecorder.exe -l "5503 192.168.1.1:8912" -p save/ -f data -s "200 600" -n "El Psy Congroo."
+UDPRecorder.exe -l "5503 8912" -s "0 600" -i 2.0 -n "El Psy Congroo."
+
 指定需要监听的地址
 ```
 -l [ip:port]
