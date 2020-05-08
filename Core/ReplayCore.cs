@@ -2,7 +2,6 @@
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using System.Linq;
 
 using DRRCommon;
 using FileManager;
@@ -33,7 +32,7 @@ namespace Core
             return result;
         }
 
-        private double _sleepDelay = 0.001;
+        private double _sleepDelay = 0.001 / 2.0;
         public ReplayCore(IEnumerable<string> paths)
         {
             _reader = new Reader(paths);
@@ -50,7 +49,7 @@ namespace Core
                 }
                 watch.Stop();
 
-                _sleepDelay = watch.Elapsed.TotalSeconds / 10000;
+                _sleepDelay = watch.Elapsed.TotalSeconds / 10000 / 2.0;
             });
 
             InfoThread();
@@ -187,18 +186,14 @@ namespace Core
                     {
                         var sendTiming = (msg.header.time - pkg.time) / SpeedRate;
 
-                        while (_watch.Elapsed.TotalSeconds + sendDelay < sendTiming)
+                        while (_watch.Elapsed.TotalSeconds + _sleepDelay + sendDelay < sendTiming)
                         {
                             if (_signalJump)
                             {
                                 RePlayThread();
                                 return;
                             }
-
-                            if (_watch.Elapsed.TotalSeconds + _sleepDelay + sendDelay < sendTiming)
-                            {
-                                SleepHelper.Delay();
-                            }
+                            SleepHelper.Delay();
                         }
 
                         _map.TryGetValue(ConverToIP64(msg.header.ip, msg.header.port), out var point);
@@ -211,18 +206,14 @@ namespace Core
                     }
 
                     // 发送下一个 pkg 之前的延时
-                    while (_watch.Elapsed.TotalSeconds < _reader.Interval / SpeedRate)
+                    while (_watch.Elapsed.TotalSeconds + _sleepDelay < _reader.Interval / SpeedRate)
                     {
                         if (_signalJump)
                         {
                             RePlayThread();
                             return;
                         }
-
-                        if (_watch.Elapsed.TotalSeconds + _sleepDelay < _reader.Interval / SpeedRate)
-                        {
-                            SleepHelper.Delay();
-                        }
+                        SleepHelper.Delay();
                     }
 
 
@@ -232,8 +223,7 @@ namespace Core
                     {
                         time = DateTime.UtcNow,
                         index = pkg.index,
-                        //pkgCostTime = _watch.Elapsed.TotalSeconds
-                        pkgCostTime = (pkg.GetMessages().First().header.time - pkg.time) / SpeedRate
+                        pkgCostTime = _watch.Elapsed.TotalSeconds
                     });
 
 
