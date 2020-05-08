@@ -159,7 +159,7 @@ namespace FileManager
                             }
 
                             pkg.index = _currentIndex;
-                            pkg.time = pkg.index * _current.header.timeInterval + _current.header.time;
+                            pkg.time = pkg.index * _current.header.timeInterval + StartTime;
 
                             EDCoder.Decoder.GetMessages(ref pkg);
 
@@ -203,7 +203,7 @@ namespace FileManager
                         }
 
                         pkg.index = _currentIndex;
-                        pkg.time = pkg.index * _current.header.timeInterval + _current.header.time;
+                        pkg.time = pkg.index * _current.header.timeInterval + StartTime;
 
                         //EDCoder.Decoder.GetMessages(ref pkg);
 
