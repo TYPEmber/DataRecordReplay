@@ -2,6 +2,7 @@
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using System.Linq;
 
 using DRRCommon;
 using FileManager;
@@ -32,25 +33,28 @@ namespace Core
             return result;
         }
 
-        private double _sleepDelay = 0.001 / 2.0;
+        private double _sleepDelay = 0.0005;
         public ReplayCore(IEnumerable<string> paths)
         {
             _reader = new Reader(paths);
 
-            // 用于测算当前设备 _sleepDelay
-            Task.Run(() =>
-            {
-                Stopwatch watch = new Stopwatch();
-
-                watch.Start();
-                for (int i = 0; i < 10000; i++)
-                {
-                    SleepHelper.Delay();
-                }
-                watch.Stop();
-
-                _sleepDelay = watch.Elapsed.TotalSeconds / 10000 / 2.0;
-            });
+            //// 用于测算当前设备 _sleepDelay
+            //Task.Run(() =>
+            //{
+            //    Stopwatch watch = new Stopwatch();
+            //    double sum = 0;
+            //    watch.Start();
+            //    for (int i = 0; i < 10000; i++)
+            //    {
+            //        var a = watch.Elapsed.TotalSeconds;
+            //        SleepHelper.Delay();
+            //        var aa = watch.Elapsed.TotalSeconds;
+            //        var aaa = aa - a;
+            //        sum += aaa;
+            //    }
+            //    watch.Stop();
+            //    _sleepDelay = watch.Elapsed.TotalSeconds / 10000.0;
+            //});
 
             InfoThread();
             RePlayThread();
@@ -182,6 +186,8 @@ namespace Core
 
                     //Logger.Debug.WriteLine(pkg.index);
 
+                    //int c = 0, d = 0;
+
                     foreach (var msg in pkg.GetMessages())
                     {
                         var sendTiming = (msg.header.time - pkg.time) / SpeedRate;
@@ -193,7 +199,23 @@ namespace Core
                                 RePlayThread();
                                 return;
                             }
-                            SleepHelper.Delay();
+
+
+                            //if (_watch.Elapsed.TotalSeconds + _sleepDelay + sendDelay < sendTiming)
+                            //{
+                                //c++;
+                                //var a = _watch.Elapsed.TotalSeconds + _sleepDelay + sendDelay - sendTiming;
+                                SleepHelper.Delay();
+                                //if (_watch.Elapsed.TotalSeconds + _sleepDelay + sendDelay < sendTiming)
+                                //{
+                                //    var aa = _watch.Elapsed.TotalSeconds + _sleepDelay + sendDelay - sendTiming;
+                                //    var aaa = a - aa;
+                                //}
+                            //}
+                            //else
+                            //{
+                            //    d++;
+                            //}
                         }
 
                         _map.TryGetValue(ConverToIP64(msg.header.ip, msg.header.port), out var point);
@@ -213,7 +235,11 @@ namespace Core
                             RePlayThread();
                             return;
                         }
-                        SleepHelper.Delay();
+
+                        //if (_watch.Elapsed.TotalSeconds + _sleepDelay < _reader.Interval / SpeedRate)
+                        //{
+                            SleepHelper.Delay();
+                        //}
                     }
 
 
@@ -224,6 +250,7 @@ namespace Core
                         time = DateTime.UtcNow,
                         index = pkg.index,
                         pkgCostTime = _watch.Elapsed.TotalSeconds
+                        //pkgCostTime = (pkg.GetMessages().First().header.time - pkg.time) / SpeedRate
                     });
 
 

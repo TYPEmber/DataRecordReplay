@@ -2,7 +2,7 @@
   "profiles": {
     "UDPLclEditor": {
       "commandName": "Project",
-      "commandLineArgs": "-p C:\\Users\\nono0\\source\\repos\\TYPEmber\\DataRecordReplay\\UDPReplayer\\bin\\Debug\\netcoreapp3.1\\SJG_Clip -s \"1024 3600\""
+      "commandLineArgs": "-p C:\\Users\\nono0\\source\\repos\\TYPEmber\\DataRecordReplay\\UDPReplayer\\bin\\Debug\\netcoreapp3.1\\SJG_Clip -s \"1024 3600\" -r \"0 481\""
     }
   }
 }
