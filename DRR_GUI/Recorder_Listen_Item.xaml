@@ -1,0 +1,13 @@
+﻿<UserControl x:Class="DRR_GUI.Recorder_Listen_Item"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:DRR_GUI"
+             mc:Ignorable="d" 
+             d:DesignHeight="20" d:DesignWidth="300">
+    <Grid HorizontalAlignment="Left" Margin="3,0,0,0" Width="297">
+        <TextBlock Name="Num" Text="TextBlock" TextWrapping="Wrap" Margin="0,0,274,0"/>
+        <local:Input_IP_Port x:Name="Point" Margin="40,0,0,0" HorizontalAlignment="Left" Width="275"/>
+    </Grid>
+</UserControl>

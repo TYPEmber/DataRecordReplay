@@ -13,9 +13,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DRRCommon", "DRRCommon\DRRC
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UDPReplayer", "UDPReplayer\UDPReplayer.csproj", "{44D98DC3-E730-4A1D-8A95-E3DEC7061172}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Core", "Core\Core.csproj", "{F2B5717B-C23A-40AB-9079-92AF3DC75F1B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Core", "Core\Core.csproj", "{F2B5717B-C23A-40AB-9079-92AF3DC75F1B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UDPLclEditor", "UDPLclEditor\UDPLclEditor.csproj", "{8F8E41E1-AD48-4A49-BBB3-2356468F10EE}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UDPLclEditor", "UDPLclEditor\UDPLclEditor.csproj", "{8F8E41E1-AD48-4A49-BBB3-2356468F10EE}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DRR_GUI", "DRR_GUI\DRR_GUI.csproj", "{424C24E9-42B5-41E4-8427-72AA346963DE}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -51,6 +53,10 @@ Global
 		{8F8E41E1-AD48-4A49-BBB3-2356468F10EE}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8F8E41E1-AD48-4A49-BBB3-2356468F10EE}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8F8E41E1-AD48-4A49-BBB3-2356468F10EE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{424C24E9-42B5-41E4-8427-72AA346963DE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{424C24E9-42B5-41E4-8427-72AA346963DE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{424C24E9-42B5-41E4-8427-72AA346963DE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{424C24E9-42B5-41E4-8427-72AA346963DE}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

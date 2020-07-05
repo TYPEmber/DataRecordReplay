@@ -127,7 +127,7 @@ namespace UDPRecorder
             }
 
 
-            string path = "/";
+            string path = "data/";
             string name = DateTime.UtcNow.ToString("yyyy-MM-dd_HH-mm-ss");
             if (para.ContainsKey("-p"))
             {

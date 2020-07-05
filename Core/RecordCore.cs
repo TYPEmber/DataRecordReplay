@@ -15,6 +15,7 @@ namespace Core
     {
         private double _startTimeStamp;
         private double _intervalTime;
+        private bool _flagStop = false;
 
         private Writer _writer;
         public RecordCore(double[] segmentPara, string path, string name, string notes, List<IPEndPoint> points, double intervalTime = 1.0, DeleInfoHandler infoHandler = null)
@@ -35,6 +36,7 @@ namespace Core
 
         public void WriteComplete()
         {
+            _flagStop = true;
             _writer.FlushAndClose();
         }
 
@@ -76,6 +78,11 @@ namespace Core
                         continue;
                     }
 
+                    if (_flagStop)
+                    {
+                        return null;
+                    }
+
                     SleepHelper.Delay();
                 }
             });
@@ -104,6 +111,10 @@ namespace Core
                         {
                             do
                             {
+                                if (_flagStop)
+                                {
+                                    return null;
+                                }
                                 _writer.Append(pkg);
 
                                 // Core 中不应该有直接输出

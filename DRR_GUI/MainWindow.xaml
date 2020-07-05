@@ -1,0 +1,39 @@
+﻿<Window x:Class="DRR_GUI.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:DRR_GUI"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="490" Width="369">
+    <Grid>
+        <TabControl>
+            <TabItem Name="Tab_Recorder" Header="Recorder">
+                <Grid Background="#FFE5E5E5" Initialized="Recorder_Grid_Initialized">
+                    <TextBlock HorizontalAlignment="Left" Margin="10,10,0,0" Text="Listen List" TextWrapping="Wrap" VerticalAlignment="Top"/>
+                    <ListBox Name="Recorder_Listen_List" Height="106" VerticalAlignment="Top" Margin="10,30,10,0"/>
+                    <Button Name ="Recorder_Button_Add_Listener" Content="Add Listener" Margin="10,141,10,0" VerticalAlignment="Top" Height="36" Click="Recroder_Button_Add_Listener_Click"/>
+                    <Button x:Name ="Recorder_Button_Start" Content="Start" Margin="10,0,10,10" Click="Recroder_Button_Start_Click" Height="36" VerticalAlignment="Bottom"/>
+                    <Grid>
+                        <Button Name="Recorder_Button_Path" Content="Path: /" Margin="10,200,0,0" VerticalAlignment="Top" Click="Recorder_Path_Button_Click" Height="19" HorizontalAlignment="Left" Width="236"/>
+                        <TextBlock HorizontalAlignment="Left" Margin="10,182,0,0" Text="File Config" TextWrapping="Wrap" VerticalAlignment="Top"/>
+                        <TextBox Name="Recorder_FileName" Margin="251,200,40,0" Text="Data" TextWrapping="Wrap" VerticalAlignment="Top" Height="19"/>
+                        <TextBox Name="Recorder_Notes" Margin="10,227,10,0" Text="Notes:" TextWrapping="Wrap" VerticalAlignment="Top" Height="42"/>
+                        <TextBlock Margin="0,202,10,0" Text=".LCL" TextWrapping="Wrap" VerticalAlignment="Top" Height="17" HorizontalAlignment="Right" Width="25"/>
+                    </Grid>
+
+
+                    <TextBlock HorizontalAlignment="Left" Margin="10,274,0,0" Text="Record Config" TextWrapping="Wrap" VerticalAlignment="Top"/>
+
+                </Grid>
+            </TabItem>
+            <TabItem Name="Tab_Replayer" Header="Replayer">
+                <Grid Background="#FFE5E5E5"/>
+            </TabItem>
+            <TabItem Name="Tab_Editor" Header="Editor">
+                <Grid Background="#FFE5E5E5"/>
+            </TabItem>
+        </TabControl>
+
+    </Grid>
+</Window>

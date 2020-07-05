@@ -246,11 +246,17 @@ namespace FileManager
 
         public void Flush()
         {
-            fs.Flush();
+            lock (locker)
+            {
+                fs.Flush();
+            }
         }
         public void Close()
         {
-            fs.Close();
+            lock (locker)
+            {
+                fs.Close();
+            }
         }
     }
 }
