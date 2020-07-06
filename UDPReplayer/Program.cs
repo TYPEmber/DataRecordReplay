@@ -175,9 +175,13 @@ namespace UDPReplayer
             // 获取文件 info
             _fInfo = core.FileInfo;
 
-            Core.ReplayCore.DeleSendHandler sendHandler = (ReadOnlySpan<byte> bytes, IPEndPoint point) =>
+            //Core.ReplayCore.DeleSendHandler sendHandler = (ReadOnlySpan<byte> bytes, IPEndPoint point) =>
+            //{
+            //    sender.Send(bytes.ToArray(), point);
+            //};
+            Core.ReplayCore.DeleSendHandler sendHandler = (Core.ReplayCore.SendInfo msg) =>
             {
-                sender.Send(bytes.ToArray(), point);
+                sender.Send(msg.bytes.ToArray(), msg.point);
             };
             Core.ReplayCore.DeleInfoHandler infoHandler = (Core.ReplayCore.ReplayInfo info) =>
             {

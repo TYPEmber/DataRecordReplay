@@ -8,8 +8,8 @@
              d:DesignHeight="20" Width="174">
     <Grid Margin="0,0,0,0">
         <TextBlock HorizontalAlignment="Left" Text="IP:" TextWrapping="Wrap" VerticalAlignment="Center"/>
-        <TextBox HorizontalAlignment="Left"  Name ="ip" Margin="19,0,0,0" Text="127.0.0.1" TextWrapping="Wrap" VerticalAlignment="Center" Width="72"/>
+        <TextBox HorizontalAlignment="Left"  Name ="ip" Margin="19,0,0,0" Text="" TextWrapping="Wrap" VerticalAlignment="Center" Width="72"/>
         <TextBlock HorizontalAlignment="Left" Text="Port:" TextWrapping="Wrap" VerticalAlignment="Center" Width="33" Margin="96,0,0,0"/>
-        <TextBox HorizontalAlignment="Left"  Name ="port" Margin="129,0,0,0" Text="5503" TextWrapping="Wrap" VerticalAlignment="Center" Width="42"/>
+        <TextBox HorizontalAlignment="Left"  Name ="port" Margin="129,0,0,0" Text="" TextWrapping="Wrap" VerticalAlignment="Center" Width="42"/>
     </Grid>
 </UserControl>

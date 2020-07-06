@@ -11,10 +11,10 @@
             <TabItem Name="Tab_Recorder" Header="Recorder">
                 <Grid Background="#FFE5E5E5" Initialized="Recorder_Grid_Initialized">
                     <TextBlock HorizontalAlignment="Left" Margin="10,10,0,0" Text="Listen List" TextWrapping="Wrap" VerticalAlignment="Top"/>
-                    <ListBox Name="Recorder_Listen_List" Height="106" VerticalAlignment="Top" Margin="10,30,10,0"/>
-                    <Button Name ="Recorder_Button_Add_Listener" Content="Add Listener" Margin="10,141,10,0" VerticalAlignment="Top" Height="36" Click="Recroder_Button_Add_Listener_Click"/>
-                    <Button x:Name ="Recorder_Button_Start" Content="Start" Margin="10,0,10,10" Click="Recroder_Button_Start_Click" Height="36" VerticalAlignment="Bottom"/>
-                    <Grid>
+                    <ListBox Name="Recorder_Listen_List" Height="106" VerticalAlignment="Top" Margin="10,30,10,0" Grid.ColumnSpan="2"/>
+                    <Button Name ="Recorder_Button_Add_Listener" Content="Add Listener" Margin="10,141,10,0" VerticalAlignment="Top" Height="36" Click="Recroder_Button_Add_Listener_Click" Grid.ColumnSpan="2"/>
+                    <Button x:Name ="Recorder_Button_Start" Content="Start" Margin="10,0,10,10" Click="Recroder_Button_Start_Click" Height="36" VerticalAlignment="Bottom" Grid.ColumnSpan="2"/>
+                    <Grid Grid.ColumnSpan="2">
                         <Button Name="Recorder_Button_Path" Content="Path: /" Margin="10,200,0,0" VerticalAlignment="Top" Click="Recorder_Path_Button_Click" Height="19" HorizontalAlignment="Left" Width="236"/>
                         <TextBlock HorizontalAlignment="Left" Margin="10,182,0,0" Text="File Config" TextWrapping="Wrap" VerticalAlignment="Top"/>
                         <TextBox Name="Recorder_FileName" Margin="251,200,40,0" Text="Data" TextWrapping="Wrap" VerticalAlignment="Top" Height="19"/>
@@ -23,12 +23,27 @@
                     </Grid>
 
 
-                    <TextBlock HorizontalAlignment="Left" Margin="10,274,0,0" Text="Record Config" TextWrapping="Wrap" VerticalAlignment="Top"/>
+                    <TextBlock HorizontalAlignment="Left" Margin="10,274,0,0" Text="Record Config" TextWrapping="Wrap" VerticalAlignment="Top" Grid.ColumnSpan="2"/>
+                    <TextBlock HorizontalAlignment="Left" Margin="10,301,0,0" Text="Split_By" TextWrapping="Wrap" VerticalAlignment="Top"/>
+                    <TextBox Name="Recorder_Seg_Size" HorizontalAlignment="Left" Margin="58,301,0,0" Text="0" TextWrapping="Wrap" VerticalAlignment="Top" Width="82" Grid.ColumnSpan="2"/>
+                    <TextBlock HorizontalAlignment="Left" Margin="66,301,0,0" Text="MB" TextWrapping="Wrap" VerticalAlignment="Top" Grid.Column="1"/>
+                    <TextBlock HorizontalAlignment="Right" Margin="0,301,149,0" Text="Split_By" TextWrapping="Wrap" VerticalAlignment="Top" Grid.Column="1"/>
+                    <TextBox Name="Recorder_Seg_Time" Margin="0,301,69,0" Text="0" TextWrapping="Wrap" VerticalAlignment="Top" Grid.Column="1" HorizontalAlignment="Right" Width="77"/>
+                    <TextBlock Margin="0,301,10,0" Text="Seconds" TextWrapping="Wrap" VerticalAlignment="Top" Grid.Column="1" HorizontalAlignment="Right" Width="54"/>
+
+
+                    <TextBlock Name="Recorder_Info" Margin="10,331,10,59" Text="" TextWrapping="Wrap" Grid.ColumnSpan="2"/>
 
                 </Grid>
             </TabItem>
             <TabItem Name="Tab_Replayer" Header="Replayer">
-                <Grid Background="#FFE5E5E5"/>
+                <Grid Background="#FFE5E5E5" Initialized="Grid_Initialized">
+                    <Slider Name="Replayer_Slider" Margin="10,0,10,96" Height="18" VerticalAlignment="Bottom"/>
+                    <Button Name="Replayer_Path" Content="Path to File-0.LCL:" Margin="10,10,10,0" VerticalAlignment="Top" Height="32" Click="Replayer_Path_Click"/>
+                    <Button Name="Replayer_Button_Play" Content="Play" HorizontalAlignment="Left" Margin="10,0,0,10" Width="172" Click="Replayer_Button_Play_Click" Height="51" VerticalAlignment="Bottom"/>
+                    <ListBox Name ="Replayer_Map"  Margin="10,67,10,249"/>
+                    <TextBlock HorizontalAlignment="Left" Margin="10,47,0,0" Text="Map List:" TextWrapping="Wrap" VerticalAlignment="Top"/>
+                </Grid>
             </TabItem>
             <TabItem Name="Tab_Editor" Header="Editor">
                 <Grid Background="#FFE5E5E5"/>

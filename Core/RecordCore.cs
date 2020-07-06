@@ -154,6 +154,10 @@ namespace Core
                     {
                         do
                         {
+                            if (_flagStop)
+                            {
+                                return null;
+                            }
                             _writer.Append(pkg);
 
                             // Core 中不应该有直接输出

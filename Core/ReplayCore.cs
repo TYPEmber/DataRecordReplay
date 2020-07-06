@@ -56,6 +56,7 @@ namespace Core
             //    _sleepDelay = watch.Elapsed.TotalSeconds / 10000.0;
             //});
 
+            SendThread();
             InfoThread();
             RePlayThread();
         }
@@ -124,8 +125,31 @@ namespace Core
         private ConcurrentQueue<ReplayInfo> _infos = new ConcurrentQueue<ReplayInfo>();
         public delegate void DeleInfoHandler(ReplayInfo info);
         private DeleInfoHandler _infoHandler;
-        public delegate void DeleSendHandler(ReadOnlySpan<byte> bytes, IPEndPoint point);
+
+        public struct SendInfo
+        {
+            public ReadOnlyMemory<byte> bytes;
+            public IPEndPoint point;
+        }
+        public delegate void DeleSendHandler(SendInfo msg);
         private DeleSendHandler _sendHandler;
+        private ConcurrentQueue<SendInfo> _msgForSend = new ConcurrentQueue<SendInfo>();
+        private void SendThread()
+        {
+            Task.Run(() =>
+            {
+                while (true)
+                {
+                    if (_msgForSend.TryDequeue(out SendInfo msg))
+                    {
+                        _sendHandler?.Invoke(msg);
+                        continue;
+                    }
+
+                    SleepHelper.Delay();
+                }
+            });
+        }
 
         private void InfoThread()
         {
@@ -203,14 +227,14 @@ namespace Core
 
                             //if (_watch.Elapsed.TotalSeconds + _sleepDelay + sendDelay < sendTiming)
                             //{
-                                //c++;
-                                //var a = _watch.Elapsed.TotalSeconds + _sleepDelay + sendDelay - sendTiming;
-                                SleepHelper.Delay();
-                                //if (_watch.Elapsed.TotalSeconds + _sleepDelay + sendDelay < sendTiming)
-                                //{
-                                //    var aa = _watch.Elapsed.TotalSeconds + _sleepDelay + sendDelay - sendTiming;
-                                //    var aaa = a - aa;
-                                //}
+                            //c++;
+                            //var a = _watch.Elapsed.TotalSeconds + _sleepDelay + sendDelay - sendTiming;
+                            SleepHelper.Delay();
+                            //if (_watch.Elapsed.TotalSeconds + _sleepDelay + sendDelay < sendTiming)
+                            //{
+                            //    var aa = _watch.Elapsed.TotalSeconds + _sleepDelay + sendDelay - sendTiming;
+                            //    var aaa = a - aa;
+                            //}
                             //}
                             //else
                             //{
@@ -224,7 +248,9 @@ namespace Core
                             continue;
                         }
 
-                        _sendHandler?.Invoke(msg.bytes.Span, point);
+                        _msgForSend.Enqueue(new SendInfo() { bytes = msg.bytes, point = point });
+
+                        //_sendHandler?.Invoke(msg.bytes.Span, point);
                     }
 
                     // 发送下一个 pkg 之前的延时
@@ -238,7 +264,7 @@ namespace Core
 
                         //if (_watch.Elapsed.TotalSeconds + _sleepDelay < _reader.Interval / SpeedRate)
                         //{
-                            SleepHelper.Delay();
+                        SleepHelper.Delay();
                         //}
                     }
 

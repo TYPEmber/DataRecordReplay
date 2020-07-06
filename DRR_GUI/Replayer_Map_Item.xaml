@@ -1,0 +1,16 @@
+﻿<UserControl x:Class="DRR_GUI.Replayer_Map_Item"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:DRR_GUI"
+             mc:Ignorable="d" 
+             d:DesignHeight="20" d:DesignWidth="430">
+    <Grid HorizontalAlignment="Left" Margin="3,0,0,0" Width="430">
+        <TextBlock Name="Num" Text="0" TextWrapping="Wrap" Margin="0,2,283,-2"/>
+        <TextBlock Name="IP_Port" Text="127.000.000.001:05503 =>" TextWrapping="Wrap" Margin="19,2,0,-2" HorizontalAlignment="Left" Width="164"/>
+        <TextBlock Text="=>" TextWrapping="Wrap" Margin="153,2,0,-2" HorizontalAlignment="Left" Width="19"/>
+        <local:Input_IP_Port x:Name="Point" Margin="177,1,0,-1" HorizontalAlignment="Left" Width="275"/>
+        <CheckBox Name="Valid" IsChecked="True" Content="Enable" Margin="357,0,0,0" VerticalAlignment="Center" HorizontalAlignment="Left" Width="73"/>
+    </Grid>
+</UserControl>

@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations.Schema;
+using System.Net;
 using System.Text;
 using System.Windows;
 using System.Windows.Controls;
@@ -15,22 +15,18 @@ using System.Windows.Shapes;
 namespace DRR_GUI
 {
     /// <summary>
-    /// Recorder_Listen_Item.xaml 的交互逻辑
+    /// Replayer_Map_Item.xaml 的交互逻辑
     /// </summary>
-    public partial class Recorder_Listen_Item : UserControl
+    public partial class Replayer_Map_Item : UserControl
     {
-        private EventHandler _delete_callback = null;
-        public Recorder_Listen_Item(int num, EventHandler delete_callback)
+        public IPEndPoint _point;
+        public Replayer_Map_Item(int num, IPEndPoint point)
         {
             InitializeComponent();
 
             Num.Text = num.ToString();
-            _delete_callback = delete_callback;
-        }
-
-        private void Delete_Button_Click(object sender, RoutedEventArgs e)
-        {
-            _delete_callback?.Invoke(this, e);
+            IP_Port.Text = point.ToString();
+            _point = point;
         }
     }
 }
