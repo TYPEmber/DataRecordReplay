@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:DRR_GUI"
         mc:Ignorable="d"
-        Title="MainWindow" Height="490" Width="369">
+        Title="DRR_GUI V1.0.0.1" Height="490" Width="369">
     <Grid>
         <TabControl>
             <TabItem Name="Tab_Recorder" Header="Recorder">
@@ -24,29 +24,49 @@
 
 
                     <TextBlock HorizontalAlignment="Left" Margin="10,274,0,0" Text="Record Config" TextWrapping="Wrap" VerticalAlignment="Top" Grid.ColumnSpan="2"/>
-                    <TextBlock HorizontalAlignment="Left" Margin="10,301,0,0" Text="Split_By" TextWrapping="Wrap" VerticalAlignment="Top"/>
-                    <TextBox Name="Recorder_Seg_Size" HorizontalAlignment="Left" Margin="58,301,0,0" Text="0" TextWrapping="Wrap" VerticalAlignment="Top" Width="82" Grid.ColumnSpan="2"/>
-                    <TextBlock HorizontalAlignment="Left" Margin="66,301,0,0" Text="MB" TextWrapping="Wrap" VerticalAlignment="Top" Grid.Column="1"/>
-                    <TextBlock HorizontalAlignment="Right" Margin="0,301,149,0" Text="Split_By" TextWrapping="Wrap" VerticalAlignment="Top" Grid.Column="1"/>
-                    <TextBox Name="Recorder_Seg_Time" Margin="0,301,69,0" Text="0" TextWrapping="Wrap" VerticalAlignment="Top" Grid.Column="1" HorizontalAlignment="Right" Width="77"/>
-                    <TextBlock Margin="0,301,10,0" Text="Seconds" TextWrapping="Wrap" VerticalAlignment="Top" Grid.Column="1" HorizontalAlignment="Right" Width="54"/>
+                    <TextBlock Margin="10,301,0,0" Text="Split_By" TextWrapping="Wrap" VerticalAlignment="Top" HorizontalAlignment="Left" Width="45"/>
+                    <TextBox Name="Recorder_Seg_Size" Margin="58,301,0,0" Text="0" TextWrapping="Wrap" VerticalAlignment="Top" HorizontalAlignment="Left" Width="68"/>
+                    <TextBlock Margin="131,301,0,0" Text="MB" TextWrapping="Wrap" VerticalAlignment="Top" HorizontalAlignment="Left" Width="24"/>
+                    <TextBox Name="Recorder_Seg_Time" Margin="160,301,135,0" Text="0" TextWrapping="Wrap" VerticalAlignment="Top"/>
+                    <TextBlock Margin="233,301,0,0" Text="Seconds" TextWrapping="Wrap" VerticalAlignment="Top" HorizontalAlignment="Left" Width="54"/>
 
 
-                    <TextBlock Name="Recorder_Info" Margin="10,331,10,59" Text="" TextWrapping="Wrap" Grid.ColumnSpan="2"/>
+                    <TextBlock Name="Recorder_Info" Margin="10,331,10,0" Text="" TextWrapping="Wrap" Height="58" VerticalAlignment="Top"/>
 
                 </Grid>
             </TabItem>
             <TabItem Name="Tab_Replayer" Header="Replayer">
-                <Grid Background="#FFE5E5E5" Initialized="Grid_Initialized">
-                    <Slider Name="Replayer_Slider" Margin="10,0,10,96" Height="18" VerticalAlignment="Bottom"/>
+                <Grid Background="#FFE5E5E5" Initialized="Replayer_Grid_Initialized">
+                    <Slider Name="Replayer_Slider" Margin="10,261,10,0" Height="18" Foreground="Black" VerticalAlignment="Top" PreviewMouseLeftButtonUp="Replayer_Slider_PreviewMouseLeftButtonUp" PreviewMouseLeftButtonDown="Replayer_Slider_PreviewMouseLeftButtonDown"/>
                     <Button Name="Replayer_Path" Content="Path to File-0.LCL:" Margin="10,10,10,0" VerticalAlignment="Top" Height="32" Click="Replayer_Path_Click"/>
-                    <Button Name="Replayer_Button_Play" Content="Play" HorizontalAlignment="Left" Margin="10,0,0,10" Width="172" Click="Replayer_Button_Play_Click" Height="51" VerticalAlignment="Bottom"/>
-                    <ListBox Name ="Replayer_Map"  Margin="10,67,10,249"/>
+                    <Button Name="Replayer_Button_Play" Content="Play" Margin="10,0,10,10" Click="Replayer_Button_Play_Click" Height="36" VerticalAlignment="Bottom"/>
+                    <ListBox Name ="Replayer_Map"  Margin="10,67,10,265"/>
                     <TextBlock HorizontalAlignment="Left" Margin="10,47,0,0" Text="Map List:" TextWrapping="Wrap" VerticalAlignment="Top"/>
+                    <TextBlock Name="Replayer_Info" Margin="10,284,10,0" Text="" TextWrapping="Wrap" VerticalAlignment="Top" Height="72"/>
+                    <TextBlock Name ="Replayer_Notes" Margin="10,188,10,0" Text="Notes:" TextWrapping="Wrap" VerticalAlignment="Top" Height="68"/>
+                    <TextBlock HorizontalAlignment="Left" Margin="10,0,0,64" Text="Speed:" TextWrapping="Wrap" Height="15" VerticalAlignment="Bottom"/>
+                    <ComboBox Name="Replayer_Speed" Margin="54,0,93,59" SelectionChanged="Replayer_Speed_SelectionChanged" Height="21" VerticalAlignment="Bottom"/>
+                    <CheckBox Name="Replayer_Flag_Loop" IsChecked="True" Content="Loop" Margin="275,0,10,63" Height="15" VerticalAlignment="Bottom"/>
                 </Grid>
             </TabItem>
             <TabItem Name="Tab_Editor" Header="Editor">
-                <Grid Background="#FFE5E5E5"/>
+                <Grid Name="Editor_Grid" Background="#FFE5E5E5" Initialized="Editor_Grid_Initialized">
+                    <Button Name="Editor_Path" Content="Path to File-0.LCL:" Margin="10,10,10,0" VerticalAlignment="Top" Height="32" Click="Editor_Path_Click"/>
+                    <Button Name="Editor_Button_Path" Content="Path: /" Margin="10,55,0,0" VerticalAlignment="Top" Click="Editor_Button_Path_Click" Height="19" HorizontalAlignment="Left" Width="236"/>
+                    <TextBox Name="Editor_FileName" Margin="251,55,40,0" Text="Data" TextWrapping="Wrap" VerticalAlignment="Top" Height="19"/>
+                    <TextBlock Margin="0,57,10,0" Text=".LCL" TextWrapping="Wrap" VerticalAlignment="Top" Height="17" HorizontalAlignment="Right" Width="25"/>
+                    <Button Name="Editor_Button_Play" Content="Convert" Margin="10,0,10,10" Click="Editor_Button_Convert_Click" Height="43" VerticalAlignment="Bottom"/>
+                    <TextBlock Margin="10,88,0,0" Text="Split_By" TextWrapping="Wrap" VerticalAlignment="Top" HorizontalAlignment="Left" Width="45"/>
+                    <TextBox Name="Editor_Seg_Size" Margin="58,88,0,0" Text="0" TextWrapping="Wrap" VerticalAlignment="Top" HorizontalAlignment="Left" Width="68"/>
+                    <TextBlock Margin="131,88,0,0" Text="MB" TextWrapping="Wrap" VerticalAlignment="Top" HorizontalAlignment="Left" Width="24"/>
+                    <TextBox Name="Editor_Seg_Time" Margin="160,88,135,0" Text="0" TextWrapping="Wrap" VerticalAlignment="Top"/>
+                    <TextBlock Margin="233,88,0,0" Text="Seconds" TextWrapping="Wrap" VerticalAlignment="Top" HorizontalAlignment="Left" Width="54"/>
+                    <TextBox Name="Editor_Notes" Margin="10,156,10,0" Text="Notes:" TextWrapping="Wrap" VerticalAlignment="Top" Height="105"/>
+                    <TextBlock HorizontalAlignment="Left" Margin="10,119,0,0" Text="Clip By From" TextWrapping="Wrap" VerticalAlignment="Top"/>
+                    <TextBox Name="Editor_Clip_From" HorizontalAlignment="Left" Margin="88,119,0,0" Text="0" TextWrapping="Wrap" VerticalAlignment="Top" Width="73"/>
+                    <TextBlock HorizontalAlignment="Left" Margin="166,119,0,0" Text="To" TextWrapping="Wrap" VerticalAlignment="Top"/>
+                    <TextBox Name="Editor_Clip_To" HorizontalAlignment="Left" Margin="186,119,0,0" Text="0" TextWrapping="Wrap" VerticalAlignment="Top" Width="120"/>
+                </Grid>
             </TabItem>
         </TabControl>
 

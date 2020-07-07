@@ -5,6 +5,7 @@
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <UseWPF>true</UseWPF>
     <UseWindowsForms>true</UseWindowsForms>
+    <ApplicationIcon>favicon 2.ico</ApplicationIcon>
   </PropertyGroup>
 
   <ItemGroup>

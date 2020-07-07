@@ -169,7 +169,8 @@ namespace Core
                                 time = DateTime.UtcNow,
                                 count = pkg.MsgCount,
                                 codedLength = pkg.codedLength,
-                                originLength = pkg.originLength
+                                originLength = pkg.originLength,
+                                pkgTime = pkg.time
                             });
 
                             indexTime += _intervalTime;
