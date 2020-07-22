@@ -247,7 +247,15 @@ namespace DRR_GUI
 
                 paths = System.IO.Directory.GetFiles(pf, name + "*.lcl");
 
-                Replayer_Path.Content = "Path to File-0.LCL: " + pf;
+                paths = paths.OrderBy(x =>
+                {
+                    var i = x.LastIndexOf("_") + 1;
+                    var j = x.Length - ".lcl".Length;
+                    var s = x.Substring(i, j - i);
+                    return int.Parse(s);
+                }).ToArray();
+
+                Replayer_Path.Content = "Path to File_0.LCL: " + pf;
 
                 _replayer = new Core.ReplayCore(paths);
 
@@ -435,6 +443,14 @@ namespace DRR_GUI
                 name = name.Remove(name.LastIndexOf('_'));
 
                 paths = System.IO.Directory.GetFiles(_editor_path, name + "*.lcl");
+
+                paths = paths.OrderBy(x =>
+                {
+                    var i = x.LastIndexOf("_") + 1;
+                    var j = x.Length - ".lcl".Length;
+                    var s = x.Substring(i, j - i);
+                    return int.Parse(s);
+                }).ToArray();
 
                 Editor_Path.Content = "Path to File-0.LCL: " + _editor_path;
 
