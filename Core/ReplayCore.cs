@@ -70,7 +70,7 @@ namespace Core
             {
                 var key = ConverToIP64(m.Key.Address.GetAddressBytes(), (ushort)m.Key.Port);
 
-                _map.Add(key, m.Value);
+                _map[key] = m.Value;
             }
 
             return this;
