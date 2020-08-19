@@ -91,7 +91,7 @@ namespace DRR_GUI
 
                         var reciver = new UDPReciverWithTime(item.Point.Get_IPPORT());
 
-                        reciver.GetSocket().ReceiveBufferSize = 1024 * 1024;
+                        reciver.GetSocket().ReceiveBufferSize = 10 * 1024 * 1024;
                         reciver.QueueHeapCountMax = 1024;
                         reciver.QueueHeap_Event += (int heapCount) =>
                         {
@@ -211,7 +211,7 @@ namespace DRR_GUI
         private void Replayer_Grid_Initialized(object sender, EventArgs e)
         {
             _sender = new UDPSender();
-            _sender.GetSocket().SendBufferSize = 2 * 1024 * 1024;
+            _sender.GetSocket().SendBufferSize = 10 * 1024 * 1024;
 
             Replayer_Speed.Items.Add("0.01x");
             Replayer_Speed.Items.Add("0.1x");
