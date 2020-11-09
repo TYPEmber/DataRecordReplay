@@ -126,6 +126,8 @@ namespace FileManager
         {
             _current.Flush();
             _current.Close();
+
+            GC.Collect();
         }
     }
 }

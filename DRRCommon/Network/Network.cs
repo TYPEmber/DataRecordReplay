@@ -579,7 +579,25 @@ namespace DRRCommon.Network
 
         public void Send(byte[] msg, IPEndPoint point)
         {
-            _UDPClient.Send(msg, msg.Length, point);
+            while (true)
+            {
+                try
+                {
+                    _UDPClient.Send(msg, msg.Length, point);
+                    break;
+                }
+                catch (SocketException e)
+                {
+                    if (e.SocketErrorCode == SocketError.WouldBlock)
+                    {
+                        SleepHelper.Delay();
+                    }
+                    else
+                    {
+                        throw e;
+                    }
+                }
+            }
         }
 
         /// <summary>
@@ -632,7 +650,25 @@ namespace DRRCommon.Network
         {
             foreach (var point in _RemoteAddr.Values)
             {
-                _UDPClient.Send(msg, msg.Length, point);
+                while (true)
+                {
+                    try
+                    {
+                        _UDPClient.Send(msg, msg.Length, point);
+                        break;
+                    }
+                    catch (SocketException e)
+                    {
+                        if (e.SocketErrorCode == SocketError.WouldBlock)
+                        {
+                            SleepHelper.Delay();
+                        }
+                        else
+                        {
+                            throw e;
+                        }
+                    }
+                }
             }
         }
 

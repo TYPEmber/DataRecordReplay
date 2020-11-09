@@ -15,6 +15,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using System.Collections;
 
 namespace DRR_GUI
 {
@@ -91,10 +92,11 @@ namespace DRR_GUI
 
                         var reciver = new UDPReciverWithTime(item.Point.Get_IPPORT());
 
-                        reciver.GetSocket().ReceiveBufferSize = 10 * 1024 * 1024;
+                        reciver.GetSocket().ReceiveBufferSize = 30 * 1024 * 1024;
                         reciver.QueueHeapCountMax = 1024;
                         reciver.QueueHeap_Event += (int heapCount) =>
                         {
+                            MessageBox.Show("Out of buffer size! HeapCount: " + heapCount);
                             return UDPReciverWithTime.QueueClearMode.Cancel;
                         };
 
@@ -208,10 +210,14 @@ namespace DRR_GUI
         #region Replayer
         private Core.ReplayCore _replayer = null;
         private UDPSender _sender = null;
+
+        //private Dictionary<IPEndPoint, UDPSender> _senders = null;
+
         private void Replayer_Grid_Initialized(object sender, EventArgs e)
         {
             _sender = new UDPSender();
-            _sender.GetSocket().SendBufferSize = 10 * 1024 * 1024;
+            _sender.GetSocket().Blocking = false;
+            var ret = _sender.GetSocket().SendBufferSize = 50 * 1024 * 1024;
 
             Replayer_Speed.Items.Add("0.01x");
             Replayer_Speed.Items.Add("0.1x");
@@ -316,10 +322,6 @@ namespace DRR_GUI
                 _replayer.Initial(map,
                 (Core.ReplayCore.SendInfo msg) =>
                 {
-                    if (msg.bytes.Length == 0)
-                    {
-
-                    }
                     _sender.Send(msg.bytes.ToArray(), msg.point);
                 },
                 (Core.ReplayCore.ReplayInfo info) =>
@@ -528,23 +530,29 @@ namespace DRR_GUI
                 return;
             }
 
+            Editor_Grid.IsEnabled = false;
+
+
+            Task.Run(() =>
+            {
+                MessageBox.Show("Convert Start!");
+            });
+
             try
             {
-                Editor_Grid.IsEnabled = false;
-                MessageBox.Show("Convert Start!");
-
                 _editor.Clip(start, end, segPara, _editor_path, Editor_FileName.Text, Editor_Notes.Text);
+
+                MessageBox.Show("Success!");
             }
             catch (Exception ee)
             {
                 MessageBox.Show(ee.Message);
             }
-
-
-            MessageBox.Show("Success!");
-            Editor_Grid.IsEnabled = true;
+            finally
+            {
+                Editor_Grid.IsEnabled = true;
+            }
         }
-
-        #endregion
     }
+    #endregion
 }

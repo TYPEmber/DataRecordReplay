@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:DRR_GUI"
         mc:Ignorable="d"
-        Title="DRR_GUI V1.0.0.3" Height="490" Width="369">
+        Title="DRR_GUI V1.0.0.4" Height="490" Width="369">
     <Grid>
         <TabControl>
             <TabItem Name="Tab_Recorder" Header="Recorder">

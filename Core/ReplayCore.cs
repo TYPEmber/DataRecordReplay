@@ -65,6 +65,7 @@ namespace Core
         {
             _sendHandler = sendHandler;
             _infoHandler = infoHandler;
+            _map.Clear();
 
             foreach (var m in map)
             {
@@ -90,6 +91,7 @@ namespace Core
             if (_watch.IsRunning)
             {
                 _watch.Stop();
+                GC.Collect();
             }
             else
             {
@@ -143,10 +145,11 @@ namespace Core
                     if (_msgForSend.TryDequeue(out SendInfo msg))
                     {
                         _sendHandler?.Invoke(msg);
-                        continue;
                     }
-
-                    SleepHelper.Delay();
+                    else
+                    {
+                        SleepHelper.Delay();
+                    }
                 }
             });
         }
