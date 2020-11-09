@@ -133,10 +133,10 @@ namespace DRRCommon
             SharedMemory.Return(originBytes);
             SharedMemory.Return(codedBytes);
 
-            //codedBytes = null;
-            //codedLength = 0;
-            //originBytes = null;
-            //originLength = 0;
+            codedBytes = null;
+            codedLength = 0;
+            originBytes = null;
+            originLength = 0;
         }
     }
 

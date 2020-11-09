@@ -106,7 +106,7 @@ namespace FileManager
         }
 
 
-        private void ReadFile(ref Package pkg)
+        private bool ReadFile(ref Package pkg)
         {
             // 当前 file 读取到末尾
             if (_current.Position >= _current.Length)
@@ -127,12 +127,14 @@ namespace FileManager
                 else
                 {
                     // 播放至尽头
-                    pkg = null;
-                    return;
+                    // pkg = null 表明文件已读完
+                    PackagePool.Return(ref pkg);
+                    return false;
                 }
             }
 
             _current.Read(ref pkg);
+            return true;
         }
 
         ConcurrentQueue<Package> _buffer = new ConcurrentQueue<Package>();
@@ -150,9 +152,7 @@ namespace FileManager
 
                         lock (_lockerCurrentIndex)
                         {
-                            this.ReadFile(ref pkg);
-
-                            if (pkg == null)
+                            if (!this.ReadFile(ref pkg))
                             {
                                 SleepHelper.Delay();
                                 continue;
