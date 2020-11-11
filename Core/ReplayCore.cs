@@ -276,7 +276,7 @@ namespace Core
                     //Logger.Debug.WriteLine(pkg.index + " " + _watch.Elapsed.TotalSeconds);
                     _infos.Enqueue(new ReplayInfo()
                     {
-                        time = DateTime.UtcNow,
+                        time = new DateTime((long)(pkg.time * 1e7)).AddYears(1970 - 1).AddDays(-1),
                         index = pkg.index,
                         pkgCostTime = _watch.Elapsed.TotalSeconds
                         //pkgCostTime = (pkg.GetMessages().First().header.time - pkg.time) / SpeedRate
