@@ -24,6 +24,12 @@ namespace DRRCommon.Network
             Port = port;
         }
 
+        public IPandPort(IPEndPoint point)
+        {
+            IP = point.Address.ToString();
+            Port = point.Port;
+        }
+
         private string _ip;
         public string IP
         {
@@ -104,12 +110,25 @@ namespace DRRCommon.Network
 
         public static bool operator ==(IPandPort a, IPandPort b)
         {
+            if (a as object == null)
+            {
+                if (b as object == null)
+                {
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
+            }
+
             return a.Equals(b);
         }
 
         public static bool operator !=(IPandPort a, IPandPort b)
         {
-            return !a.Equals(b);
+
+            return !(a == b);
         }
     }
 

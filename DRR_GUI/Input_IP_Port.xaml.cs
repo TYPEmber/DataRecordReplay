@@ -27,6 +27,18 @@ namespace DRR_GUI
             InitializeComponent();
         }
 
+        public Input_IP_Port Set_IPPORT(IPandPort point)
+        {
+            if (point != null)
+            {
+                ip.Text = point.IP;
+                port.Text = point.Port.ToString();
+            }
+    
+            return this;
+        }
+
+
         public IPEndPoint Get_IPEND()
         {
             var ret = new IPEndPoint(IPAddress.Parse(ip.Text), ushort.Parse(port.Text));

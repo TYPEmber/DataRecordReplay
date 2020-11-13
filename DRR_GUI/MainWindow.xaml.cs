@@ -235,6 +235,8 @@ namespace DRR_GUI
             Replayer_Speed.SelectedItem = "1x";
         }
 
+        private DRRCommon.ParaJSON Replayer_Replay_Params_Manager = null;
+
         private void Replayer_Path_Click(object sender, RoutedEventArgs e)
         {
             string[] paths = null;
@@ -247,9 +249,11 @@ namespace DRR_GUI
             else
             {
                 var p = openFileDialog.FileName;
-                var pf = p.Remove(p.LastIndexOf('\\'));
+                var pf = p.Remove(p.LastIndexOf('\\')) + "\\";
                 var name = openFileDialog.SafeFileName;
                 name = name.Remove(name.LastIndexOf('_'));
+
+                Replayer_Replay_Params_Manager = new ParaJSON(pf + name + "_rPara.json");
 
                 paths = System.IO.Directory.GetFiles(pf, name + "*.lcl");
 
@@ -267,13 +271,20 @@ namespace DRR_GUI
 
                 var info = _replayer.FileInfo;
 
-                // open a new file
-                Replayer_Map.Items.Clear();
-                Replayer_Speed.SelectedItem = "1x";
-                foreach (var point in info.points)
+                // try to load params
+                if (!Load_Replay_Params())
                 {
-                    Replayer_Map.Items.Add(new Replayer_Map_Item(Replayer_Map.Items.Count, point));
+                    // open a new file
+                    Replayer_Map.Items.Clear();
+
+                    foreach (var point in info.points)
+                    {
+                        Replayer_Map.Items.Add(new Replayer_Map_Item(Replayer_Map.Items.Count, point));
+                    }
                 }
+
+                Replayer_Speed.SelectedItem = "1x";
+
 
                 Replayer_Notes.Text = info.notes;
                 Replayer_Slider.Maximum = info.totalIndex;
@@ -348,12 +359,57 @@ namespace DRR_GUI
 
                 _replayer.P();
                 Replayer_IsPlaying();
+
+                // save params
+                Save_Replay_Params();
             }
             else
             {
                 _replayer.P();
                 Replayer_NotPlaying();
             }
+        }
+
+        private bool Load_Replay_Params()
+        {
+            try
+            {
+                var dic = Replayer_Replay_Params_Manager.LoadObjectFromFile(typeof(Dictionary<IPandPort, Tuple<IPandPort, bool>>))
+                    as Dictionary<IPandPort, Tuple<IPandPort, bool>>;
+                Replayer_Map.Items.Clear();
+                foreach (var item in dic)
+                {
+                    var bu = new Replayer_Map_Item(Replayer_Map.Items.Count, new IPEndPoint(IPAddress.Parse(item.Key.IP), item.Key.Port));
+                    bu.Point.Set_IPPORT(item.Value.Item1);
+                    bu.Valid.IsChecked = item.Value.Item2;
+                    Replayer_Map.Items.Add(bu);
+                }
+                return true;
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+        }
+
+        private void Save_Replay_Params()
+        {
+            var dic = new Dictionary<IPandPort, Tuple<IPandPort, bool>>();
+            foreach (Replayer_Map_Item item in Replayer_Map.Items)
+            {
+                IPandPort point;
+                try
+                {
+                    point = item.Point.Get_IPPORT();
+                }
+                catch (Exception)
+                {
+                    point = null;
+                }
+
+                dic.Add(new IPandPort(item._point), new Tuple<IPandPort, bool>(point, (bool)item.Valid.IsChecked));
+            }
+            Replayer_Replay_Params_Manager.SaveObjectToFile(dic);
         }
 
         private void Replayer_IsPlaying()
