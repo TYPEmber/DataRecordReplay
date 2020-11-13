@@ -272,7 +272,7 @@ namespace DRR_GUI
                 var info = _replayer.FileInfo;
 
                 // try to load params
-                if (!Load_Replay_Params())
+                if (!Load_Replay_Params(info))
                 {
                     // open a new file
                     Replayer_Map.Items.Clear();
@@ -370,7 +370,7 @@ namespace DRR_GUI
             }
         }
 
-        private bool Load_Replay_Params()
+        private bool Load_Replay_Params(FileManager.File.Info info)
         {
             try
             {
@@ -379,7 +379,12 @@ namespace DRR_GUI
                 Replayer_Map.Items.Clear();
                 foreach (var item in dic)
                 {
-                    var bu = new Replayer_Map_Item(Replayer_Map.Items.Count, new IPEndPoint(IPAddress.Parse(item.Key.IP), item.Key.Port));
+                    var rcv_point = new IPEndPoint(IPAddress.Parse(item.Key.IP), item.Key.Port);
+                    if (!info.points.Contains(rcv_point))
+                    {
+                        return false;
+                    }
+                    var bu = new Replayer_Map_Item(Replayer_Map.Items.Count, rcv_point);
                     bu.Point.Set_IPPORT(item.Value.Item1);
                     bu.Valid.IsChecked = item.Value.Item2;
                     Replayer_Map.Items.Add(bu);
