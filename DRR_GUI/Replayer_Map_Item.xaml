@@ -6,11 +6,11 @@
              xmlns:local="clr-namespace:DRR_GUI"
              mc:Ignorable="d" 
              d:DesignHeight="20" d:DesignWidth="430">
-    <Grid HorizontalAlignment="Left" Margin="3,0,0,0" Width="430">
+    <Grid HorizontalAlignment="Left" Margin="3,0,0,0" Width="450">
         <TextBlock Name="Num" Text="0" TextWrapping="Wrap" Margin="0,2,283,-2"/>
         <TextBlock Name="IP_Port" Text="127.000.000.001:05503 =>" TextWrapping="Wrap" Margin="19,2,0,-2" HorizontalAlignment="Left" Width="164"/>
         <TextBlock Text="=>" TextWrapping="Wrap" Margin="153,2,0,-2" HorizontalAlignment="Left" Width="19"/>
         <local:Input_IP_Port x:Name="Point" Margin="177,1,0,-1" HorizontalAlignment="Left" Width="275"/>
-        <CheckBox Name="Valid" IsChecked="True" Content="Enable" Margin="357,0,0,0" VerticalAlignment="Center" HorizontalAlignment="Left" Width="73"/>
+        <CheckBox Name="Valid" IsChecked="True" Content="Enable" Margin="377,0,0,0" VerticalAlignment="Center" HorizontalAlignment="Left" Width="73"/>
     </Grid>
 </UserControl>

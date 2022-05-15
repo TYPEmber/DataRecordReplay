@@ -9,18 +9,23 @@ namespace FileManager
 {
     public class Reader
     {
+        DRRCommon.Logger.ILogger _logger;
+
         List<File> _files;
         IndexManager _index;
 
         File _current;
         long _currentIndex;
+        bool _alive;
 
         public double StartTime { private set; get; }
         public long Count { get { return _index.Total; } }
         public double Interval { get { return _current.header.timeInterval; } }
 
-        public Reader(IEnumerable<string> paths, bool flagAutoDecode = true)
+        public Reader(IEnumerable<string> paths, bool flagAutoDecode = true, DRRCommon.Logger.ILogger logger = null)
         {
+            _alive = true;
+            _logger = logger;
             _files = new List<File>();
 
             foreach (var path in paths)
@@ -43,6 +48,19 @@ namespace FileManager
                 BufferThreadWithoutDecode();
             }
 
+        }
+
+        public void Destroy()
+        {
+            _alive = false;
+            PackagePool.Clear();
+
+            _current.Close();
+            foreach (var pkg in _buffer)
+            {
+                pkg.Clear();
+            }
+            _buffer.Clear();
         }
 
         public File.Info GetFilesInfo()
@@ -128,7 +146,8 @@ namespace FileManager
                 {
                     // 播放至尽头
                     // pkg = null 表明文件已读完
-                    PackagePool.Return(ref pkg);
+                    //PackagePool.Return(ref pkg);
+                    pkg.Clear();
                     return false;
                 }
             }
@@ -138,47 +157,56 @@ namespace FileManager
         }
 
         ConcurrentQueue<Package> _buffer = new ConcurrentQueue<Package>();
+
         private void BufferThread()
         {
             int bufferSize = 3;
             Task.Run(() =>
             {
-                while (true)
+                while (_alive)
                 {
-                    if (_buffer.Count <= bufferSize)
+                    try
                     {
-                        Package pkg = PackagePool.Rent();
-                        //Package pkg = new Package();
-
-                        lock (_lockerCurrentIndex)
+                        if (_buffer.Count <= bufferSize)
                         {
-                            if (!this.ReadFile(ref pkg))
+                           //Package pkg = PackagePool.Rent();
+                            Package pkg = new Package();
+
+                            lock (_lockerCurrentIndex)
                             {
-                                SleepHelper.Delay();
-                                continue;
+                                if (!this.ReadFile(ref pkg))
+                                {
+                                    SleepHelper.Delay();
+                                    continue;
+                                }
+
+                                pkg.index = _currentIndex;
+                                pkg.time = pkg.index * _current.header.timeInterval + StartTime;
+
+                                EDCoder.Decoder.GetMessages(ref pkg);
+
+                                _buffer.Enqueue(pkg);
+
+                                //减少内存占用
+                                //Console.WriteLine(GC.GetTotalMemory(false) - 10 * (pkg.codedBytes.Length + pkg.originBytes.Length + pkg.msgsAsBytesLength));
+                                if (GC.GetTotalMemory(false) > bufferSize * (pkg.codedBytes.Length + pkg.originBytes.Length + pkg.msgsAsBytesLength))
+                                {
+                                    GC.Collect();
+                                }
+
+                                _currentIndex++;
                             }
-
-                            pkg.index = _currentIndex;
-                            pkg.time = pkg.index * _current.header.timeInterval + StartTime;
-
-                            EDCoder.Decoder.GetMessages(ref pkg);
-
-                            _buffer.Enqueue(pkg);
-
-                            //减少内存占用
-                            //Console.WriteLine(GC.GetTotalMemory(false) - 10 * (pkg.codedBytes.Length + pkg.originBytes.Length + pkg.msgsAsBytesLength));
-                            if (GC.GetTotalMemory(false) > bufferSize * (pkg.codedBytes.Length + pkg.originBytes.Length + pkg.msgsAsBytesLength))
-                            {
-                                GC.Collect();
-                            }
-
-                            _currentIndex++;
+                        }
+                        else
+                        {
+                            SleepHelper.Delay();
                         }
                     }
-                    else
+                    catch (Exception e)
                     {
-                        SleepHelper.Delay();
+                        _logger?.WriteLine(e);
                     }
+
                 }
             });
         }
@@ -187,12 +215,12 @@ namespace FileManager
         {
             Task.Run(() =>
             {
-                while (true)
+                while (_alive)
                 {
                     if (_buffer.Count <= 3)
                     {
-                        Package pkg = PackagePool.Rent();
-                        //Package pkg = new Package();
+                        //Package pkg = PackagePool.Rent();
+                        Package pkg = new Package();
 
                         this.ReadFile(ref pkg);
 

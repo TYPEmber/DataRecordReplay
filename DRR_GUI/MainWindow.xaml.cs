@@ -29,6 +29,8 @@ namespace DRR_GUI
             InitializeComponent();
         }
 
+        DRRCommon.Logger.Logger_ForFile _logger = new DRRCommon.Logger.Logger_ForFile(flushInterval: 1);
+
         #region Recorder
 
         private void Recorder_Grid_Initialized(object sender, EventArgs e)
@@ -265,9 +267,12 @@ namespace DRR_GUI
                     return int.Parse(s);
                 }).ToArray();
 
-                Replayer_Path.Content = "Path to File_0.LCL: " + pf;
+                Replayer_Path.Content = pf + name;
 
-                _replayer = new Core.ReplayCore(paths);
+                // stop inner loop
+                _replayer?.Destroy();
+                GC.Collect();
+                _replayer = new Core.ReplayCore(paths, _logger);
 
                 var info = _replayer.FileInfo;
 

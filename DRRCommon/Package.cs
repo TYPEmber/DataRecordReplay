@@ -78,6 +78,11 @@ namespace DRRCommon
             pkg.Clear();
             _pool.Enqueue(pkg);
         }
+
+        public static void Clear()
+        {
+            _pool.Clear();
+        }
     }
 
     [StructLayoutAttribute(LayoutKind.Sequential, Pack = 1)]

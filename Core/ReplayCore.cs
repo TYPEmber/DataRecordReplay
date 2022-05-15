@@ -15,7 +15,9 @@ namespace Core
 {
     public class ReplayCore
     {
+        DRRCommon.Logger.ILogger _logger;
         Reader _reader;
+        bool _alive;
 
         Dictionary<long, IPEndPoint> _map = new Dictionary<long, IPEndPoint>();
 
@@ -34,9 +36,11 @@ namespace Core
         }
 
         private double _sleepDelay = 0.0005;
-        public ReplayCore(IEnumerable<string> paths)
+        public ReplayCore(IEnumerable<string> paths, ILogger logger = null)
         {
-            _reader = new Reader(paths);
+            _alive = true;
+            _logger = logger;
+            _reader = new Reader(paths, logger: logger);
 
             //// 用于测算当前设备 _sleepDelay
             //Task.Run(() =>
@@ -59,6 +63,18 @@ namespace Core
             SendThread();
             InfoThread();
             RePlayThread();
+        }
+
+        public void Destroy()
+        {
+            _msgForSend.Clear();
+            _reader.Destroy();
+            _alive = false;
+        }
+
+        ~ReplayCore()
+        {
+
         }
 
         public ReplayCore Initial(Dictionary<IPEndPoint, IPEndPoint> map, DeleSendHandler sendHandler, DeleInfoHandler infoHandler)
@@ -136,11 +152,12 @@ namespace Core
         public delegate void DeleSendHandler(SendInfo msg);
         private DeleSendHandler _sendHandler;
         private ConcurrentQueue<SendInfo> _msgForSend = new ConcurrentQueue<SendInfo>();
+
         private void SendThread()
         {
             Task.Run(() =>
             {
-                while (true)
+                while (_alive)
                 {
                     if (_msgForSend.TryDequeue(out SendInfo msg))
                     {
@@ -158,7 +175,7 @@ namespace Core
         {
             Task.Run(() =>
             {
-                while (true)
+                while (_alive)
                 {
                     if (_infos.TryDequeue(out ReplayInfo info))
                     {
@@ -188,7 +205,7 @@ namespace Core
                     _watch.Reset();
                 }
 
-                while (true)
+                while (_alive)
                 {
                     var pkg = _reader.Get();
 
@@ -293,9 +310,9 @@ namespace Core
                         _signalEnd = false;
                     }
 
-                    // 需要在所有使用 pkg 的代码完成后再归还
-                    // 缓解内存压力
-                    _reader.Return(ref pkg);
+                    //// 需要在所有使用 pkg 的代码完成后再归还
+                    //// 缓解内存压力
+                    //_reader.Return(ref pkg);
 
                     _watch.Restart();
                 }
